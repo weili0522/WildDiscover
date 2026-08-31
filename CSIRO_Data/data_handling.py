@@ -2,9 +2,9 @@ import os
 import rasterio
 
 def inspect_raster_metadata(file_path, display_name):
-    """Reads basic raster attributes and estimates RAM usage."""
+    # Reads basic attributes and estimates RAM usage
     if not os.path.exists(file_path):
-        print(f"Error: File '{file_path}' not found. Please check the file path.\n")
+        print(f"Error: File '{file_path}' not found.\n")
         return
 
     with rasterio.open(file_path) as src:
@@ -19,13 +19,12 @@ def inspect_raster_metadata(file_path, display_name):
         bounds = src.bounds
         res_x, res_y = src.res
 
-        # Calculate uncompressed memory footprint in RAM
-        # Reads only a single 1x1 pixel window to determine the data type's byte size
+        # Calculate RAM requirement without any changes
         itemsize = src.read(1, window=rasterio.windows.Window(0, 0, 1, 1)).itemsize
         estimated_ram_gb = (total_pixels * num_bands * itemsize) / (1024 ** 3)
         file_size_gb = os.path.getsize(file_path) / (1024 ** 3)
 
-        # Print formatted summary
+        # Print summary
         print("=" * 60)
         print(f"{display_name} RASTER METADATA SUMMARY")
         print("=" * 60)
