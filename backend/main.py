@@ -20,6 +20,16 @@ app.add_middleware(
 async def root():
     return {"message": "WildDiscover API is running"}
 
+def apply_location_blurring(geojson_data):
+    """
+    Placeholder for location masking.
+
+    In Iteration 1, the GeoJSON is returned unchanged.
+    In future iterations, exact coordinates will be blurred
+    to help protect vulnerable species from poaching risks.
+    """
+    return geojson_data
+
 @app.get(
     "/api/v1/predict/{species_id}",
     response_model=GeoJSONFeatureCollection
@@ -47,7 +57,7 @@ async def predict_habitat(
             detail="Longitude is outside the supported Australian bounds"
         )
 
-    return {
+    prediction = {
         "type": "FeatureCollection",
         "features": [
             {
@@ -72,6 +82,7 @@ async def predict_habitat(
             }
         ]
     }
+    return apply_location_blurring(prediction)
 
 @app.get(
     "/api/v1/layers/habitat",
