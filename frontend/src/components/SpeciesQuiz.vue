@@ -122,13 +122,6 @@ const resetQuiz = () => {
           Back to Home
         </RouterLink>
 
-        <RouterLink
-          to="/gallery"
-          class="result-button secondary-button"
-        >
-          Explore Species Gallery
-        </RouterLink>
-
         <button
           class="try-again"
           @click="resetQuiz"
@@ -137,6 +130,13 @@ const resetQuiz = () => {
         </button>
       </div>
     </div>
+    
+    <RouterLink
+      to="/gallery"
+      class="gallery-cta"
+    >
+      Curious about other wildlife? Explore the Gallery!
+    </RouterLink>
 
   </div>
 </template>
@@ -459,5 +459,34 @@ const resetQuiz = () => {
   font-size: 11px;
 
   cursor: pointer;
+}
+
+.gallery-cta {
+  display: block;
+
+  width: 100%;
+  margin-top: 16px;
+  padding: 13px 18px;
+
+  border: 1px solid #146c4a;
+  border-radius: 8px;
+
+  background-color: #f5faf7;
+  color: #146c4a;
+
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.4;
+  text-align: center;
+  text-decoration: none;
+
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.gallery-cta:hover {
+  background-color: #146c4a;
+  color: #ffffff;
 }
 </style>
