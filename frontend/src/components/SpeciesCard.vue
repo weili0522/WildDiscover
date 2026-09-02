@@ -43,6 +43,10 @@ const emit = defineEmits(['select'])
       </div>
     </div>
 
+    <small class="image-attribution">
+      {{ species.imageCreator }} · License: {{ species.license }}
+    </small>
+
     <div
       v-if="!featured"
       class="card-body"
@@ -188,5 +192,19 @@ const emit = defineEmits(['select'])
 .status-badge.endangered {
   color: #a84848;
   background-color: #fde5e5;
+}
+
+.image-attribution {
+  display: block;
+
+  padding: 8px 14px;
+
+  color: #777777;
+  background-color: #fafafa;
+
+  border-bottom: 1px solid #eeeeee;
+
+  font-size: 10px;
+  line-height: 1.4;
 }
 </style>

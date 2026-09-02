@@ -10,42 +10,54 @@ const species = [
     scientificName: 'Pezoporus occidentalis',
     status: 'Critically Endangered',
     statusClass: 'critical',
-    image: new URL('../assets/night-parrot.jpg', import.meta.url).href
+    image: new URL('../assets/night-parrot.jpg', import.meta.url).href,
+    imageCreator: 'AI-generated for WildDiscover',
+    license: 'Not applicable'
   },
   {
     name: 'Plains-wanderer',
     scientificName: 'Pedionomus torquatus',
     status: 'Critically Endangered',
     statusClass: 'critical',
-    image: new URL('../assets/plains-wanderer.jpg', import.meta.url).href
+    image: new URL('../assets/plains-wanderer.jpg', import.meta.url).href,
+    imageCreator: 'AI-generated for WildDiscover',
+    license: 'Not applicable'
   },
   {
     name: 'Princess Parrot',
     scientificName: 'Polytelis alexandrae',
     status: 'Vulnerable',
     statusClass: 'vulnerable',
-    image: new URL('../assets/princess-parrot.jpg', import.meta.url).href
+    image: new URL('../assets/princess-parrot.jpg', import.meta.url).href,
+    imageCreator: 'AI-generated for WildDiscover',
+    license: 'Not applicable'
   },
   {
     name: 'Dusky Grasswren',
     scientificName: 'Amytornis purnelli',
     status: 'Lesser Concern',
     statusClass: 'lesser',
-    image: new URL('../assets/dusky-grasswren.jpg', import.meta.url).href
+    image: new URL('../assets/dusky-grasswren.jpg', import.meta.url).href,
+    imageCreator: 'AI-generated for WildDiscover',
+    license: 'Not applicable'
   },
   {
     name: 'Malleefowl',
     scientificName: 'Leipoa ocellata',
     status: 'Vulnerable',
     statusClass: 'vulnerable',
-    image: new URL('../assets/malleefowl.jpg', import.meta.url).href
+    image: new URL('../assets/malleefowl.jpg', import.meta.url).href,
+    imageCreator: 'AI-generated for WildDiscover',
+    license: 'Not applicable'
   },
   {
     name: 'Rufous Scrub-bird',
     scientificName: 'Atrichornis rufescens',
     status: 'Endangered',
     statusClass: 'endangered',
-    image: new URL('../assets/rufous-scrub-bird.jpg', import.meta.url).href
+    image: new URL('../assets/rufous-scrub-bird.jpg', import.meta.url).href,
+    imageCreator: 'AI-generated for WildDiscover',
+    license: 'Not applicable'
   }
 ]
 </script>
