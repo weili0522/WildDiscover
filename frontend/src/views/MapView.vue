@@ -46,7 +46,17 @@
     <aside class="map-sidebar">
 
       <!-- Insights -->
-      <SpeciesInsights />
+      <SpeciesInsights
+        v-if="speciesData"
+        :species="speciesData"
+      />
+
+      <div
+        v-else
+        class="insights-loading"
+      >
+        Loading species insights...
+      </div>
 
       <!-- Quiz placeholder -->
       <SpeciesQuiz />
@@ -56,11 +66,13 @@
 </template>
 
 <script setup>
-import { onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import SpeciesQuiz from '../components/SpeciesQuiz.vue'
 import SpeciesInsights from '../components/SpeciesInsights.vue'
+
+const speciesData = ref(null)
 
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'
@@ -84,6 +96,7 @@ onMounted(async () => {
     }
 
     const geojson = await response.json()
+    speciesData.value = geojson.features?.[0]?.properties ?? null
 
     L.geoJSON(geojson, {
       style: {
@@ -266,6 +279,18 @@ onMounted(async () => {
   flex-direction: column;
 
   gap: 14px;
+}
+
+.insights-loading {
+  padding: 20px;
+
+  color: #666666;
+  background-color: #ffffff;
+
+  border: 1px solid #e3e3e3;
+  border-radius: 10px;
+
+  font-size: 13px;
 }
 
 /* =========================

@@ -1,7 +1,23 @@
+<script setup>
+import { computed } from 'vue'
+
+const props = defineProps({
+  species: {
+    type: Object,
+    required: true
+  }
+})
+
+const suitabilityPercentage = computed(() => {
+  const score = Number(props.species.suitability) || 0
+  return Math.min(Math.max(score * 100, 0), 100)
+})
+</script>
+
 <template>
   <div class="insights-card">
 
-    <h2>Night Parrot Insights</h2>
+    <h2>{{ species.species_name }} Insights</h2>
 
     <hr />
 
@@ -25,12 +41,15 @@
         </span>
 
         <span class="score">
-          0.85
+          {{ Number(species.suitability).toFixed(2) }}
         </span>
       </div>
 
       <div class="condition-bar">
-        <div class="condition-value"></div>
+        <div
+          class="condition-value"
+          :style="{ width: `${suitabilityPercentage}%` }"
+        ></div>
       </div>
 
       <div class="condition-text">
@@ -148,7 +167,6 @@
 }
 
 .condition-value {
-  width: 85%;
   height: 100%;
 
   background-color: #146c4a;
