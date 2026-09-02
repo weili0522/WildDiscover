@@ -2,6 +2,7 @@ import pandas as pd
 import rasterio
 import elapid
 from sklearn import metrics
+from sklearn.model_selection import cross_val_score
 
 # Data Ingestion
 presence_df = pd.read_csv("training_matrix.csv")
@@ -33,22 +34,29 @@ bg_df = pd.DataFrame({
 model_data = pd.concat([presence_df, bg_df], ignore_index=True)
 x = model_data[['elevation', 'slope', 'aspect']]
 y = model_data['presence']
+xy = model_data[['x_coord', 'y_coord']] # Save coordinates in case you want to use Spatial CV later
 
-# Model Training
-print("Training MaxEnt Model...")
+# 1. Initialize the Model
+print("Initializing MaxEnt Model...")
 model = elapid.MaxentModel(transform="cloglog")
+
+# 2. Perform 5-Fold Cross-Validation
+print("Running Cross-Validation...")
+# This splits the data 5 times, trains on 4/5, and tests on the holdout 1/5
+cv_scores = cross_val_score(model, x, y, cv=5, scoring='roc_auc')
+
+print(f"Standard 5-Fold CV ROC-AUC: {cv_scores.mean():.3f} (+/- {cv_scores.std() * 2:.3f})")
+
+# 3. Finalize Model for Mapping
+# Retrain on the entire dataset to generate the most accurate final heatmap
+print("Fitting final model on all data...")
 model.fit(x, y)
 
-y_pred = model.predict(x)
-roc_auc = metrics.roc_auc_score(y, y_pred)
-print(f"Training ROC-AUC Score: {roc_auc:.3f}")
-
-# Spatial Prediction & Export
+# 4. Spatial Prediction & Export
 print("Generating final prediction map...")
 elapid.apply_model_to_rasters(
     model,
     raster_paths,
     "habitat_suitability_maxent.tif"
 )
-
 print("Export complete: habitat_suitability_maxent.tif")
