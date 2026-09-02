@@ -62,6 +62,9 @@ import 'leaflet/dist/leaflet.css'
 import SpeciesQuiz from '../components/SpeciesQuiz.vue'
 import SpeciesInsights from '../components/SpeciesInsights.vue'
 
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'
+
 onMounted(async () => {
   const map = L.map('map').setView([-25.2744, 133.7751], 5)
 
@@ -72,8 +75,9 @@ onMounted(async () => {
 
   try {
     const response = await fetch(
-      'http://127.0.0.1:8000/api/v1/predict/pilot-bird'
+      `${API_BASE_URL}/api/v1/predict/pilot-bird`
     )
+
 
     if (!response.ok) {
       throw new Error(`API request failed: ${response.status}`)
