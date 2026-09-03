@@ -8,12 +8,9 @@ from models import GeoJSONFeatureCollection
 from fastapi.middleware.gzip import GZipMiddleware
 
 allowed_origins = [
-    origin.strip()
-    for origin in os.getenv(
-        "ALLOWED_ORIGINS",
-        "http://localhost:5173"
-    ).split(",")
-    if origin.strip()
+    "http://localhost:5173",
+    "https://wild-discover.vercel.app",
+    "https://wild-discover-46mf.vercel.app"
 ]
 
 HABITAT_GEOJSON_PATH = (
