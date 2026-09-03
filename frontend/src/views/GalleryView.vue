@@ -11,7 +11,7 @@ const species = [
     status: 'Critically Endangered',
     statusClass: 'critical',
     image: new URL('../assets/night-parrot.jpg', import.meta.url).href,
-    imageCreator: 'AI-generated for WildDiscover',
+    imageCreator: 'AI-generated for WildDiscover v2',
     license: 'Not applicable'
   },
   {
