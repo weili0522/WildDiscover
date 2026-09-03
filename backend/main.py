@@ -1,7 +1,11 @@
+import json
 import os
+from functools import lru_cache
+from pathlib import Path
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from models import GeoJSONFeatureCollection
+from fastapi.middleware.gzip import GZipMiddleware
 
 allowed_origins = [
     origin.strip()
@@ -11,6 +15,22 @@ allowed_origins = [
     ).split(",")
     if origin.strip()
 ]
+
+HABITAT_GEOJSON_PATH = (
+    Path(__file__).resolve().parent
+    / "data"
+    / "processed"
+    / "ghost_habitat_prediction.geojson"
+)
+
+@lru_cache(maxsize=1)
+def load_habitat_geojson():
+    """Load and cache the live Night Parrot habitat GeoJSON file."""
+    with HABITAT_GEOJSON_PATH.open(
+        mode="r",
+        encoding="utf-8",
+    ) as geojson_file:
+        return json.load(geojson_file)
 
 app = FastAPI(
     title="WildDiscover API",
@@ -25,6 +45,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.add_middleware(
+    GZipMiddleware,
+    minimum_size=1000,
+)
 
 @app.get("/")
 async def root():
@@ -102,31 +126,8 @@ async def predict_habitat(
             detail="Longitude is outside the supported Australian bounds"
         )
 
-    prediction = {
-        "type": "FeatureCollection",
-        "features": [
-            {
-                "type": "Feature",
-                "geometry": {
-                    "type": "Polygon",
-                    "coordinates": [
-                        [
-                            [131.0, -24.0],
-                            [134.0, -24.0],
-                            [134.0, -21.0],
-                            [131.0, -21.0],
-                            [131.0, -24.0]
-                        ]
-                    ]
-                },
-                "properties": {
-                    "species_id": species_id,
-                    "species_name": "Night Parrot",
-                    "suitability": 0.85
-                }
-            }
-        ]
-    }
+    
+    prediction = load_habitat_geojson()
     return apply_location_blurring(prediction)
 
 @app.get(
@@ -134,38 +135,10 @@ async def predict_habitat(
     response_model=GeoJSONFeatureCollection
 )
 async def get_habitat_layer():
-    """Return the default habitat suitability map layer.
-
-    This endpoint does not accept query parameters. It returns the current
-    pilot habitat layer for the Night Parrot.
+    """Return the live Night Parrot habitat suitability layer.
 
     Returns:
-        GeoJSONFeatureCollection: A GeoJSON FeatureCollection containing a
-        polygon geometry and properties for the species identifier, species
-        name, and habitat suitability score.
+        GeoJSONFeatureCollection: A GeoJSON FeatureCollection generated
+        from the live model suitability raster.
     """
-    return {
-        "type": "FeatureCollection",
-        "features": [
-            {
-                "type": "Feature",
-                "geometry": {
-                    "type": "Polygon",
-                    "coordinates": [
-                        [
-                            [131.0, -24.0],
-                            [134.0, -24.0],
-                            [134.0, -21.0],
-                            [131.0, -21.0],
-                            [131.0, -24.0]
-                        ]
-                    ]
-                },
-                "properties": {
-                    "species_id": "pilot-bird",
-                    "species_name": "Night Parrot",
-                    "suitability": 0.85
-                }
-            }
-        ]
-    }
+    return load_habitat_geojson()

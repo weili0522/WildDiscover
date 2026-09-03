@@ -77,6 +77,17 @@ const speciesData = ref(null)
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'
 
+const getSuitabilityColor = (suitability) => {
+  const score = Number(suitability)
+
+  if (score >= 0.90) return '#ef6548'
+  if (score >= 0.80) return '#f28e52'
+  if (score >= 0.70) return '#f2c75c'
+  if (score >= 0.60) return '#a8c66c'
+
+  return '#2ca58d'
+}
+
 onMounted(async () => {
   const map = L.map('map').setView([-25.2744, 133.7751], 5)
 
@@ -96,14 +107,43 @@ onMounted(async () => {
     }
 
     const geojson = await response.json()
-    speciesData.value = geojson.features?.[0]?.properties ?? null
+    const highestSuitabilityFeature = geojson.features?.reduce(
+      (highest, feature) => {
+        if (!highest) return feature
+
+        return feature.properties.suitability >
+          highest.properties.suitability
+          ? feature
+          : highest
+      },
+      null
+    )
+
+    speciesData.value =
+      highestSuitabilityFeature?.properties ?? null
 
     L.geoJSON(geojson, {
-      style: {
-      color: '#d9534f',
-      weight: 2,
-      fillColor: '#d9534f',
-      fillOpacity: 0.45
+      style: (feature) => {
+        const suitability =
+          feature?.properties?.suitability ?? 0
+
+        const color = getSuitabilityColor(suitability)
+
+        return {
+          color,
+          weight: 0.7,
+          fillColor: color,
+          fillOpacity: 0.7
+        }
+      },
+      onEachFeature: (feature, layer) => {
+        const suitability =
+          feature?.properties?.suitability ?? 0
+
+        layer.bindPopup(
+          `<strong>Night Parrot Habitat</strong><br>
+          Suitability: ${Number(suitability).toFixed(3)}`
+        )
       }
     }).addTo(map)
 
