@@ -1,0 +1,11 @@
+backend/venv/
+__pycache__/
+.pytest_cache/
+*.pyc
+.DS_Store
+
+# Large model and raster files
+backend/data/raw/
+*.tif
+*.tiff
+*.joblib

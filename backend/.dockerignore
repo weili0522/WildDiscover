@@ -1,0 +1,10 @@
+venv
+.venv
+__pycache__
+.pytest_cache
+.DS_Store
+.git
+data/raw/
+*.tif
+*.tiff
+*.joblib
