@@ -1,0 +1,73 @@
+{
+  "updatedAt": "Current cycle",
+  "users": [
+    {
+      "rank": 1,
+      "displayName": "Explorer_3108",
+      "level": "Trail Scout",
+      "points": 1480
+    },
+    {
+      "rank": 2,
+      "displayName": "Explorer_5821",
+      "level": "Habitat Tracker",
+      "points": 1320
+    },
+    {
+      "rank": 3,
+      "displayName": "Explorer_0934",
+      "level": "Field Observer",
+      "points": 1190
+    },
+    {
+      "rank": 4,
+      "displayName": "Explorer_3048",
+      "level": "Conservation Scout",
+      "points": 1050
+    },
+    {
+      "rank": 5,
+      "displayName": "Explorer_7612",
+      "level": "Avian Observer",
+      "points": 940
+    },
+    {
+      "rank": 6,
+      "displayName": "Explorer_4419",
+      "level": "Conservation Scout",
+      "points": 915
+    },
+    {
+      "rank": 7,
+      "displayName": "Explorer_1962",
+      "level": "Habitat Tracker",
+      "points": 890
+    },
+    {
+      "rank": 8,
+      "displayName": "Explorer_6503",
+      "level": "Wetland Observer",
+      "points": 880
+    },
+    {
+      "rank": 9,
+      "displayName": "Explorer_2271",
+      "level": "Species Tracker",
+      "points": 875
+    },
+    {
+      "rank": 10,
+      "displayName": "Explorer_8140",
+      "level": "Field Surveyor",
+      "points": 870
+    }
+  ],
+  "currentUser": {
+    "rank": 142,
+    "displayName": "Explorer_8942",
+    "level": "Conservation Scout",
+    "points": 860,
+    "percentile": "Top 12%",
+    "nextRankPoints": 1000
+  }
+}

@@ -1,0 +1,62 @@
+[
+  {
+    "id": 1,
+    "source": "ABC News",
+    "publishedAt": "3 hours ago",
+    "category": "Rediscoveries & Sightings",
+    "title": "Critically endangered Night Parrots detected in south-west Queensland",
+    "summary": "New field records have provided researchers with updated information about Night Parrot activity and habitat use.",
+    "image": "night-parrot",
+    "externalUrl": "https://www.abc.net.au/news/"
+  },
+  {
+    "id": 2,
+    "source": "CSIRO",
+    "publishedAt": "Yesterday",
+    "category": "Ecosystem Science",
+    "title": "New research improves understanding of spinifex habitat conditions",
+    "summary": "Researchers are studying how vegetation and environmental conditions affect threatened bird habitats.",
+    "image": "spinifex",
+    "externalUrl": "https://www.csiro.au/en/news/"
+  },
+  {
+    "id": 3,
+    "source": "BirdLife Australia",
+    "publishedAt": "2 days ago",
+    "category": "Habitat Protection",
+    "title": "New conservation work focuses on protecting threatened grassland birds",
+    "summary": "Habitat protection projects are supporting vulnerable bird species across important Australian landscapes.",
+    "image": "plains-wanderer",
+    "externalUrl": "https://birdlife.org.au/news/"
+  },
+  {
+    "id": 4,
+    "source": "Department of Climate Change & Water",
+    "publishedAt": "3 days ago",
+    "category": "Policy Updates",
+    "title": "Expanded sanctuary boundaries establish access to western arid woodlands",
+    "summary": "Stronger conservation policies aim to protect ecological corridors used by endangered desert fauna.",
+    "image": "princess-parrot",
+    "externalUrl": "https://www.dcceew.gov.au/about/news"
+  },
+  {
+    "id": 5,
+    "source": "Australian Wildlife Conservancy",
+    "publishedAt": "4 days ago",
+    "category": "Rediscoveries & Sightings",
+    "title": "Acoustic sensor arrays capture promising vocal patterns in remote Pilbara ranges",
+    "summary": "Autonomous bioacoustic listening posts deployed across isolated ranges reveal potential calls of elusive ground-dwelling species.",
+    "image": "night-parrot",
+    "externalUrl": "https://www.australianwildlife.org/news/"
+  },
+  {
+    "id": 6,
+    "source": "Nature Conservation Council",
+    "publishedAt": "5 days ago",
+    "category": "Habitat Protection",
+    "title": "Indigenous Ranger networks expand active predator tracking in key refuge zones",
+    "summary": "Collaborative on-ground stewardship removes invasive threats and protects surrounding spinifex habitats.",
+    "image": "rufous-scrub-bird",
+    "externalUrl": "https://www.nature.org.au/"
+  }
+]

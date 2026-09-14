@@ -1,352 +1,357 @@
+<script setup>
+import { computed, ref } from 'vue'
+
+import HabitatMap from '../components/HabitatMap.vue'
+import MapControls from '../components/MapControls.vue'
+import MapGuide from '../components/MapGuide.vue'
+import PredictionLegend from '../components/PredictionLegend.vue'
+import SpeciesSelector from '../components/SpeciesSelector.vue'
+import { useRouter } from 'vue-router'
+import {defaultMapFilters, targetSpecies} from '../mocks/mapOptions'
+
+const router = useRouter()
+const mapStep = ref('explore')
+const selectedSpeciesId = ref('night-parrot')
+const selectedPotential = ref(null)
+
+const activeFilters = ref({
+  selectedSpecies: [...defaultMapFilters.selectedSpecies],
+  region: defaultMapFilters.region,
+  climateHorizon: defaultMapFilters.climateHorizon,
+  probability: defaultMapFilters.probability,
+  selectedLayers: [...defaultMapFilters.selectedLayers]
+})
+
+const selectedSpecies = computed(() =>
+  targetSpecies.find(
+    (species) => species.id === selectedSpeciesId.value
+  )
+)
+
+function selectSpecies(speciesId) {
+  selectedSpeciesId.value = speciesId
+  activeFilters.value.selectedSpecies = [speciesId]
+}
+
+function selectPotential(point) {
+  selectedPotential.value = point
+
+  if (point.id === 'high') {
+    mapStep.value = 'plan'
+  }
+}
+
+function returnToExplore() {
+  mapStep.value = 'explore'
+  selectedPotential.value = null
+}
+
+function updateFilters(updatedFilters) {
+  activeFilters.value = updatedFilters
+
+  console.log('Mock map filters updated:', updatedFilters)
+}
+
+function saveZone() {
+  const savedZone = {
+    species: selectedSpecies.value,
+    potential: selectedPotential.value,
+    filters: activeFilters.value,
+    savedAt: new Date().toISOString()
+  }
+
+  localStorage.setItem(
+    'wilddiscover_saved_zone',
+    JSON.stringify(savedZone)
+  )
+
+  router.push('/journal')
+}
+</script>
+
 <template>
   <div class="map-page">
+    <div class="map-container">
+      <!-- State 1: Explore a Species -->
+      <template v-if="mapStep === 'explore'">
+        <section class="map-heading">
+          <span class="heading-badge">
+            ◉ Habitat Prediction Map
+          </span>
 
-    <!-- Left: Map -->
-    <section class="map-section">
+          <h1>Explore a Species</h1>
 
-      <div id="map"></div>
+          <p>
+            Choose a bird to explore its predicted habitat across Australia.
+          </p>
+        </section>
 
-      <!-- Target Species -->
-      <div class="species-card">
-        <span class="species-dot"></span>
+        <SpeciesSelector
+          :selected-species-id="selectedSpeciesId"
+          @select="selectSpecies"
+        />
 
-        <div>
-          <div class="species-label">Target Species</div>
-
-          <div class="species-name">
-            Night Parrot
-            <span>(Pezoporus occidentalis)</span>
+        <section class="exploration-layout">
+          <div class="map-column">
+            <HabitatMap
+              key="explore-map"
+              mode="explore"
+              @select-potential="selectPotential"
+            />
           </div>
-        </div>
-      </div>
 
-      <!-- Prediction Legend -->
-      <div class="prediction-legend">
-        <div class="legend-title">
-          PREDICTION PROBABILITY
-        </div>
+          <aside class="information-sidebar">
+            <MapGuide :active-step="2" />
 
-        <div class="legend-bar"></div>
+            <PredictionLegend />
 
-        <div class="legend-range">
-          <span>Low</span>
-          <span>High</span>
-        </div>
-      </div>
+            <div class="selected-species-card">
+              <span>ACTIVE SPECIES</span>
 
-      <!-- Data Source -->
-      <div class="data-source">
-        Data Source: AWC Acoustics (2026)
-      </div>
+              <strong>{{ selectedSpecies?.commonName }}</strong>
 
-    </section>
+              <em>{{ selectedSpecies?.scientificName }}</em>
 
+              <small>◎ {{ selectedSpecies?.habitat }}</small>
+            </div>
+          </aside>
+        </section>
+      </template>
 
-    <!-- Right Sidebar -->
-    <aside class="map-sidebar">
+      <!-- State 2: Plan Your Exploration -->
+      <template v-else>
+        <section class="planning-navigation">
+          <button
+            class="back-button"
+            type="button"
+            @click="returnToExplore"
+          >
+            ← Back
+          </button>
 
-      <!-- Insights -->
-      <SpeciesInsights
-        v-if="speciesData"
-        :species="speciesData"
-      />
+          <div class="species-pills">
+            <button
+              v-for="species in targetSpecies.slice(0, 4)"
+              :key="species.id"
+              class="species-pill"
+              :class="{
+                active: species.id === selectedSpeciesId
+              }"
+              type="button"
+              @click="selectSpecies(species.id)"
+            >
+              <span v-if="species.id === selectedSpeciesId">✓</span>
+              {{ species.commonName }}
+            </button>
 
-      <div
-        v-else
-        class="insights-loading"
-      >
-        Loading species insights...
-      </div>
+            <button class="species-pill" type="button">
+              + More Species
+            </button>
+          </div>
+        </section>
 
-      <!-- Quiz placeholder -->
-      <SpeciesQuiz />
-    </aside>
+        <section class="planning-layout">
+          <div class="map-column">
+            <HabitatMap
+              key="planning-map"
+              mode="plan"
+              @select-potential="selectPotential"
+            />
+          </div>
 
+          <MapControls
+            :key="selectedSpeciesId"
+            :initial-filters="activeFilters"
+            @update:filters="updateFilters"
+            @save-zone="saveZone"
+          />
+        </section>
+      </template>
+    </div>
   </div>
 </template>
 
-<script setup>
-import { onMounted, ref } from 'vue'
-import L from 'leaflet'
-import 'leaflet/dist/leaflet.css'
-import SpeciesQuiz from '../components/SpeciesQuiz.vue'
-import SpeciesInsights from '../components/SpeciesInsights.vue'
-
-const speciesData = ref(null)
-
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'
-
-const getSuitabilityColor = (suitability) => {
-  const score = Number(suitability)
-
-  if (score >= 0.90) return '#ef6548'
-  if (score >= 0.80) return '#f28e52'
-  if (score >= 0.70) return '#f2c75c'
-  if (score >= 0.60) return '#a8c66c'
-
-  return '#2ca58d'
-}
-
-onMounted(async () => {
-  const map = L.map('map').setView([-25.2744, 133.7751], 5)
-
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19,
-    attribution: '&copy; OpenStreetMap contributors'
-  }).addTo(map)
-
-  try {
-    const response = await fetch(
-      `${API_BASE_URL}/api/v1/predict/pilot-bird`
-    )
-
-
-    if (!response.ok) {
-      throw new Error(`API request failed: ${response.status}`)
-    }
-
-    const geojson = await response.json()
-    const highestSuitabilityFeature = geojson.features?.reduce(
-      (highest, feature) => {
-        if (!highest) return feature
-
-        return feature.properties.suitability >
-          highest.properties.suitability
-          ? feature
-          : highest
-      },
-      null
-    )
-
-    speciesData.value =
-      highestSuitabilityFeature?.properties ?? null
-
-    L.geoJSON(geojson, {
-      style: (feature) => {
-        const suitability =
-          feature?.properties?.suitability ?? 0
-
-        const color = getSuitabilityColor(suitability)
-
-        return {
-          color,
-          weight: 0.7,
-          fillColor: color,
-          fillOpacity: 0.7
-        }
-      },
-      onEachFeature: (feature, layer) => {
-        const suitability =
-          feature?.properties?.suitability ?? 0
-
-        layer.bindPopup(
-          `<strong>Night Parrot Habitat</strong><br>
-          Suitability: ${Number(suitability).toFixed(3)}`
-        )
-      }
-    }).addTo(map)
-
-    console.log('GeoJSON received:', geojson)
-  } catch (error) {
-    console.error('Failed to fetch habitat prediction:', error)
-  }
-})
-</script>
-
 <style scoped>
 .map-page {
-  display: grid;
-  grid-template-columns: minmax(0, 2fr) minmax(320px, 1fr);
-  gap: 18px;
-
-  padding: 10px;
-  background-color: #ffffff;
-
-  min-height: calc(100vh - 64px);
+  min-height: 100vh;
+  padding: 40px 24px 70px;
+  color: #293d33;
+  background: #f7f9f7;
 }
 
-
-/* =========================
-   Map
-   ========================= */
-
-.map-section {
-  position: relative;
-  min-width: 0;
-  min-height: 680px;
-}
-
-#map {
+.map-container {
   width: 100%;
-  height: 100%;
-  min-height: 680px;
-
-  z-index: 1;
+  max-width: 1320px;
+  margin: 0 auto;
 }
 
+.map-heading {
+  margin-bottom: 25px;
+}
 
-/* =========================
-   Target Species
-   ========================= */
-
-.species-card {
-  position: absolute;
-  top: 18px;
-  left: 18px;
-  z-index: 500;
-
-  display: flex;
+.heading-badge {
+  display: inline-flex;
+  margin-bottom: 11px;
+  padding: 6px 11px;
+  color: #24704f;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
   align-items: center;
-  gap: 10px;
-
-  background: rgba(255, 255, 255, 0.95);
-
-  padding: 12px 18px;
-  border-radius: 8px;
-
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  background: #ccefdc;
+  border-radius: 15px;
 }
 
-.species-dot {
-  width: 9px;
-  height: 9px;
-
-  border-radius: 50%;
-  background-color: #f3a65a;
+.map-heading h1 {
+  margin: 0 0 7px;
+  color: #14533a;
+  font-size: 34px;
+  font-weight: 700;
 }
 
-.species-label {
-  font-size: 10px;
-  font-weight: 600;
-  color: #555555;
-
-  margin-bottom: 2px;
+.map-heading p {
+  margin: 0;
+  color: #69756f;
+  font-size: 15px;
 }
 
-.species-name {
-  color: #146c4a;
-  font-size: 18px;
-  font-weight: 600;
+.exploration-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 2.15fr) minmax(280px, 1fr);
+  margin-top: 18px;
+  align-items: start;
+  gap: 20px;
 }
 
-.species-name span {
-  color: #555555;
-  font-size: 12px;
-  font-weight: 400;
+.map-column {
+  min-width: 0;
 }
 
-
-/* =========================
-   Prediction legend
-   ========================= */
-
-.prediction-legend {
-  position: absolute;
-  left: 18px;
-  bottom: 18px;
-
-  z-index: 500;
-
-  width: 220px;
-
-  padding: 13px 16px;
-
-  background-color: rgba(255, 255, 255, 0.95);
-  border-radius: 7px;
-
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-}
-
-.legend-title {
-  font-size: 10px;
-  font-weight: 600;
-
-  margin-bottom: 8px;
-}
-
-.legend-bar {
-  height: 7px;
-
-  border-radius: 10px;
-
-  background: linear-gradient(
-    to right,
-    #4ca66b,
-    #d8c95a,
-    #ef7b4d
-  );
-}
-
-.legend-range {
-  display: flex;
-  justify-content: space-between;
-
-  margin-top: 5px;
-
-  font-size: 10px;
-  font-weight: 600;
-}
-
-
-/* =========================
-   Data source
-   ========================= */
-
-.data-source {
-  position: absolute;
-
-  right: 18px;
-  bottom: 18px;
-
-  z-index: 500;
-
-  background-color: rgba(255, 255, 255, 0.9);
-
-  padding: 4px 10px;
-
-  font-size: 10px;
-  color: #666666;
-}
-
-
-/* =========================
-   Sidebar
-   ========================= */
-
-.map-sidebar {
+.information-sidebar {
   display: flex;
   flex-direction: column;
-
-  gap: 14px;
+  gap: 18px;
 }
 
-.insights-loading {
-  padding: 20px;
-
-  color: #666666;
-  background-color: #ffffff;
-
-  border: 1px solid #e3e3e3;
-  border-radius: 10px;
-
-  font-size: 13px;
+.selected-species-card {
+  display: flex;
+  padding: 18px 20px;
+  flex-direction: column;
+  background: #ffffff;
+  border: 1px solid #e1e8e3;
+  border-radius: 12px;
+  box-shadow: 0 3px 12px rgba(26, 69, 49, 0.05);
 }
 
-/* =========================
-   Responsive
-   ========================= */
+.selected-species-card > span {
+  margin-bottom: 8px;
+  color: #31805e;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
 
-@media (max-width: 900px) {
+.selected-species-card strong {
+  color: #234d39;
+  font-size: 15px;
+}
 
+.selected-species-card em {
+  margin-top: 3px;
+  color: #6c7871;
+  font-family: Georgia, serif;
+  font-size: 11px;
+}
+
+.selected-species-card small {
+  margin-top: 10px;
+  color: #4e675b;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.planning-navigation {
+  display: flex;
+  margin-bottom: 22px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.back-button {
+  padding: 8px 0;
+  color: #335648;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  background: transparent;
+  border: 0;
+}
+
+.back-button:hover {
+  color: #1e7a55;
+}
+
+.species-pills {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 7px;
+}
+
+.species-pill {
+  padding: 8px 13px;
+  color: #65716a;
+  font-size: 10px;
+  font-weight: 600;
+  background: #eef1ef;
+  border: 0;
+  border-radius: 17px;
+}
+
+.species-pill.active {
+  color: #ffffff;
+  background: #2d7a58;
+}
+
+.planning-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.85fr) minmax(310px, 0.9fr);
+  align-items: start;
+  gap: 20px;
+}
+
+@media (max-width: 960px) {
+  .planning-navigation {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .species-pills {
+    justify-content: flex-start;
+  }
+
+  .planning-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 650px) {
   .map-page {
+    padding: 28px 14px 50px;
+  }
+
+  .map-heading h1 {
+    font-size: 29px;
+  }
+
+  .information-sidebar {
     grid-template-columns: 1fr;
   }
 
-  .map-section,
-  #map {
-    min-height: 550px;
+  .selected-species-card {
+    grid-column: auto;
   }
-
 }
 </style>
