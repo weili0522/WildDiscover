@@ -1,5 +1,6 @@
 <script setup>
 import { computed, ref } from 'vue'
+import { useRouter } from 'vue-router'
 
 import {
   investigations,
@@ -10,13 +11,20 @@ import {
 import nightParrotImage from '../assets/night-parrot.jpg'
 import princessParrotImage from '../assets/princess-parrot.jpg'
 import plainsWandererImage from '../assets/plains-wanderer.jpg'
+import rufousScrubBirdImage from '../assets/rufous-scrub-bird.jpg'
+import malleefowlImage from '../assets/malleefowl.jpg'
+import duskyGrasswrenImage from '../assets/dusky-grasswren.jpg'
 
 const selectedStatus = ref('All Statuses')
+const router = useRouter()
 
 const speciesImages = {
   'night-parrot.jpg': nightParrotImage,
   'princess-parrot.jpg': princessParrotImage,
-  'plains-wanderer.jpg': plainsWandererImage
+  'plains-wanderer.jpg': plainsWandererImage,
+  'rufous-scrub-bird.jpg': rufousScrubBirdImage,
+  'malleefowl.jpg': malleefowlImage,
+  'dusky-grasswren.jpg': duskyGrasswrenImage
 }
 
 const filteredInvestigations = computed(() => {
@@ -32,6 +40,15 @@ const filteredInvestigations = computed(() => {
 
 function getImage(imageName) {
   return speciesImages[imageName]
+}
+
+function startExploration(investigation) {
+  router.push({
+    path: '/map',
+    query: {
+      species: investigation.speciesId
+    }
+  })
 }
 </script>
 
@@ -100,7 +117,7 @@ function getImage(imageName) {
       <!-- Filter -->
       <section class="journal-toolbar">
         <span>
-          All Investigations ({{ filteredInvestigations.length }})
+          All Investigations ({{ investigations.length }})
         </span>
 
         <label>
@@ -211,14 +228,15 @@ function getImage(imageName) {
             </RouterLink>
 
             <!-- Not-started investigation -->
-            <button
-              v-else
-              class="investigation-button"
-              type="button"
-            >
-              {{ investigation.actionLabel }}
-              <span>→</span>
-            </button>
+           <button
+            v-else
+            class="investigation-button"
+            type="button"
+            @click="startExploration(investigation)"
+          >
+            {{ investigation.actionLabel }}
+            <span>→</span>
+          </button>
 
           </div>
         </article>

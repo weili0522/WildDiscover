@@ -14,6 +14,8 @@ import nightParrotImage from '../assets/night-parrot.jpg'
 import princessParrotImage from '../assets/princess-parrot.jpg'
 import plainsWandererImage from '../assets/plains-wanderer.jpg'
 import rufousScrubBirdImage from '../assets/rufous-scrub-bird.jpg'
+import malleefowlImage from '../assets/malleefowl.jpg'
+import duskyGrasswrenImage from '../assets/dusky-grasswren.jpg'
 
 const router = useRouter()
 
@@ -26,7 +28,9 @@ const imageMap = {
   'night-parrot.jpg': nightParrotImage,
   'princess-parrot.jpg': princessParrotImage,
   'plains-wanderer.jpg': plainsWandererImage,
-  'rufous-scrub-bird.jpg': rufousScrubBirdImage
+  'rufous-scrub-bird.jpg': rufousScrubBirdImage,
+  'malleefowl.jpg': malleefowlImage,
+  'dusky-grasswren.jpg': duskyGrasswrenImage
 }
 
 const speciesWithImages = computed(() =>
@@ -83,7 +87,6 @@ function listenToCall(species) {
 <template>
   <div class="gallery-page">
     <div class="gallery-container">
-      <!-- Header -->
       <section class="gallery-header">
         <div>
           <span class="heading-badge">
@@ -99,14 +102,6 @@ function listenToCall(species) {
         </div>
 
         <div class="header-actions">
-          <button
-            class="community-button"
-            type="button"
-            @click="router.push('/community')"
-          >
-            Go to Community →
-          </button>
-
           <label class="search-box">
             <span>⌕</span>
 
@@ -120,14 +115,15 @@ function listenToCall(species) {
         </div>
       </section>
 
-      <!-- Challenge -->
       <section class="challenge-banner">
-        <div class="challenge-icon">♬</div>
+        <div class="challenge-icon">
+          ♬
+        </div>
 
         <div>
           <div class="challenge-title">
             <h2>Bird Call Challenge</h2>
-            <span>Weekly Field ID</span>
+            <span>Interactive</span>
           </div>
 
           <p>
@@ -144,7 +140,6 @@ function listenToCall(species) {
         </button>
       </section>
 
-      <!-- Filters -->
       <section class="filter-row">
         <button
           v-for="filter in conservationFilters"
@@ -159,7 +154,6 @@ function listenToCall(species) {
         </button>
       </section>
 
-      <!-- Species cards -->
       <section class="species-grid">
         <SpeciesCard
           v-for="species in filteredSpecies"
@@ -180,8 +174,11 @@ function listenToCall(species) {
     </div>
 
     <SpeciesModal
-      :visible="selectedSpecies?.id === 'night-parrot'"
+      :visible="Boolean(selectedSpecies)"
+      :species="selectedSpecies"
       @close="selectedSpecies = null"
+      @view-map="viewOnMap"
+      @listen="listenToCall"
     />
   </div>
 </template>
@@ -238,17 +235,6 @@ function listenToCall(species) {
   gap: 10px;
 }
 
-.community-button {
-  width: 100%;
-  padding: 10px;
-  color: #ffffff;
-  font-size: 10px;
-  font-weight: 700;
-  background: #2d7a58;
-  border: 0;
-  border-radius: 6px;
-}
-
 .search-box {
   display: flex;
   padding: 0 11px;
@@ -281,7 +267,11 @@ function listenToCall(species) {
   align-items: center;
   gap: 14px;
   background:
-    radial-gradient(circle at 80% 50%, rgba(100, 198, 148, 0.3), transparent 30%),
+    radial-gradient(
+      circle at 80% 50%,
+      rgba(100, 198, 148, 0.3),
+      transparent 30%
+    ),
     #176045;
   border-radius: 10px;
 }
@@ -335,6 +325,7 @@ function listenToCall(species) {
   background: #c9f4dd;
   border: 0;
   border-radius: 17px;
+  cursor: pointer;
 }
 
 .filter-row {
@@ -352,6 +343,7 @@ function listenToCall(species) {
   background: transparent;
   border: 0;
   border-radius: 14px;
+  cursor: pointer;
 }
 
 .filter-button span {

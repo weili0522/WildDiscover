@@ -3,162 +3,181 @@ defineProps({
   visible: {
     type: Boolean,
     default: false
+  },
+  species: {
+    type: Object,
+    default: null
   }
 })
 
-const emit = defineEmits(['close'])
+const emit = defineEmits([
+  'close',
+  'view-map',
+  'listen'
+])
+
+function closeModal() {
+  emit('close')
+}
+
+function handleBackdropClick(event) {
+  if (event.target === event.currentTarget) {
+    closeModal()
+  }
+}
 </script>
 
 <template>
   <Teleport to="body">
     <div
-      v-if="visible"
+      v-if="visible && species"
       class="modal-backdrop"
-      @click.self="emit('close')"
+      role="presentation"
+      @click="handleBackdropClick"
     >
-      <section
+      <article
         class="species-modal"
         role="dialog"
         aria-modal="true"
-        aria-labelledby="species-modal-title"
+        :aria-labelledby="`modal-title-${species.id}`"
       >
         <button
           class="close-button"
           type="button"
-          aria-label="Close"
-          @click="emit('close')"
+          aria-label="Close details"
+          @click="closeModal"
         >
           ×
         </button>
 
-        <!-- Left -->
-        <div class="modal-left">
-          <div class="image-wrapper">
-            <img
-              src="../assets/night-parrot.jpg"
-              alt="Night Parrot"
-              class="modal-image"
-            >
+        <div class="modal-grid">
+          <section class="left-column">
+            <div class="image-wrapper">
+              <img
+                :src="species.image"
+                :alt="species.name"
+              >
 
-            <span class="status-badge">
-              ● Critically Endangered
-            </span>
+              <span
+                class="status-badge"
+                :class="species.statusClass"
+              >
+                ● {{ species.status }}
+              </span>
 
-            <span class="verified-badge">
-              ALA Verified
-            </span>
-          </div>
-
-          <section class="soundscape-card">
-            <div class="soundscape-heading">
-              <strong>♬ Bioacoustic Soundscape</strong>
-              <span>0:18</span>
+              <span
+                v-if="species.verified"
+                class="verified-badge"
+              >
+                ALA Verified
+              </span>
             </div>
 
-            <div class="audio-player">
-              <button type="button" aria-label="Play bird call">
-                ▶
-              </button>
+            <div class="audio-card">
+              <div class="audio-heading">
+                <div>
+                  <strong>♬ Bioacoustic Soundscape</strong>
+                  <span>{{ species.audioDuration }}</span>
+                </div>
+              </div>
 
-              <div class="waveform" aria-hidden="true">
-                <span
-                  v-for="height in [8, 14, 10, 21, 13, 18, 9, 22, 15, 8, 16, 11]"
-                  :key="height"
-                  :style="{ height: `${height}px` }"
-                ></span>
+              <div class="audio-controls">
+                <button
+                  type="button"
+                  class="play-button"
+                  @click="emit('listen', species)"
+                >
+                  ▶
+                </button>
+
+                <div class="waveform" aria-hidden="true">
+                  <span
+                    v-for="(height, index) in [
+                      8, 14, 10, 20, 13, 24, 17,
+                      10, 19, 13, 7, 15, 9
+                    ]"
+                    :key="index"
+                    :style="{ height: `${height}px` }"
+                  />
+                </div>
+              </div>
+
+              <p>
+                Listen to this bird’s distinctive call recorded
+                in its natural habitat.
+              </p>
+            </div>
+          </section>
+
+          <section class="right-column">
+            <header class="species-title">
+              <div>
+                <h2 :id="`modal-title-${species.id}`">
+                  {{ species.name }}
+                </h2>
+
+                <em>{{ species.scientificName }}</em>
+              </div>
+            </header>
+
+            <p class="summary">
+              {{ species.description }}
+            </p>
+
+            <div class="information-grid">
+              <div class="information-card">
+                <span>⚠ Conservation Status</span>
+                <strong :class="species.statusClass">
+                  {{ species.status }}
+                </strong>
+              </div>
+
+              <div class="information-card">
+                <span>♣ Habitat</span>
+                <strong>{{ species.habitat }}</strong>
+              </div>
+
+              <div class="information-card">
+                <span>◷ Active Time</span>
+                <strong>{{ species.activeTime }}</strong>
+              </div>
+
+              <div class="information-card">
+                <span>⌖ Where It Lives</span>
+                <strong>{{ species.location }}</strong>
               </div>
             </div>
 
-            <p>
-              Listen to the Night Parrot’s distinctive whistling and
-              bell-like call recorded in remote spinifex hummocks.
-            </p>
+            <div class="why-card">
+              <span>♧ Why It Matters</span>
+              <p>{{ species.whyItMatters }}</p>
+            </div>
+
+            <div class="fact-card">
+              <strong>Did you know?</strong>
+              <p>{{ species.didYouKnow }}</p>
+            </div>
+
+            <div class="modal-actions">
+              <button
+                class="map-button"
+                type="button"
+                @click="emit('view-map', species)"
+              >
+                ⌖ View on Map
+              </button>
+
+              <button
+                class="secondary-close"
+                type="button"
+                @click="closeModal"
+              >
+                Close
+              </button>
+            </div>
           </section>
         </div>
-
-        <!-- Right -->
-        <div class="modal-right">
-          <div class="title-row">
-            <h2 id="species-modal-title">
-              Night Parrot
-            </h2>
-
-            <em>Pezoporus occidentalis</em>
-          </div>
-
-          <p class="introduction">
-            A rare nocturnal ground parrot found in remote spinifex
-            habitats in Australia.
-          </p>
-
-          <div class="information-grid">
-            <article>
-              <span>△ Conservation Status</span>
-              <strong class="critical-text">
-                Critically Endangered
-              </strong>
-            </article>
-
-            <article>
-              <span>♧ Habitat</span>
-              <strong>
-                Spinifex grasslands &amp; arid regions
-              </strong>
-            </article>
-
-            <article>
-              <span>◷ Active Time</span>
-              <strong>
-                Dusk and night (nocturnal)
-              </strong>
-            </article>
-
-            <article>
-              <span>⌖ Where It Lives</span>
-              <strong>
-                Remote inland WA &amp; QLD
-              </strong>
-            </article>
-          </div>
-
-          <article class="why-card">
-            <span>◎ Why It Matters</span>
-
-            <p>
-              One of Australia’s rarest birds and a flagship species
-              for inland biodiversity conservation and invasive
-              predator control.
-            </p>
-          </article>
-
-          <article class="fact-card">
-            <strong>♧ Did you know?</strong>
-
-            <p>
-              Night Parrots are exceptionally elusive and are far more
-              frequently detected using acoustic listening sensors
-              than visual sightings.
-            </p>
-          </article>
-
-          <div class="modal-actions">
-            <RouterLink
-              to="/map?species=night-parrot"
-              class="map-button"
-              @click="emit('close')"
-            >
-              ▣ View on Map
-            </RouterLink>
-
-            <button
-              type="button"
-              @click="emit('close')"
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      </section>
+      </article>
     </div>
   </Teleport>
 </template>
@@ -166,223 +185,249 @@ const emit = defineEmits(['close'])
 <style scoped>
 .modal-backdrop {
   position: fixed;
-  inset: 0;
   z-index: 2000;
+  inset: 0;
   display: grid;
-  padding: 25px;
+  padding: 24px;
   place-items: center;
-  background: rgba(8, 17, 12, 0.68);
+  background: rgba(8, 20, 14, 0.65);
   backdrop-filter: blur(2px);
 }
 
 .species-modal {
   position: relative;
-  display: grid;
-  grid-template-columns: minmax(260px, 0.9fr) minmax(350px, 1.25fr);
-  width: 100%;
-  max-width: 820px;
-  max-height: 92vh;
+  width: min(900px, 100%);
+  max-height: calc(100vh - 48px);
   padding: 22px;
   overflow-y: auto;
-  gap: 21px;
   background: #ffffff;
-  border-radius: 13px;
-  box-shadow: 0 25px 75px rgba(0, 0, 0, 0.3);
+  border-radius: 14px;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.28);
 }
 
 .close-button {
   position: absolute;
+  z-index: 2;
   top: 12px;
-  right: 14px;
-  z-index: 5;
-  padding: 4px;
-  color: #7a8580;
-  font-size: 19px;
+  right: 15px;
+  width: 32px;
+  height: 32px;
+  color: #65716b;
+  font-size: 25px;
   line-height: 1;
-  background: transparent;
+  background: rgba(255, 255, 255, 0.94);
   border: 0;
+  border-radius: 50%;
+  cursor: pointer;
 }
 
-.modal-left,
-.modal-right {
-  min-width: 0;
+.modal-grid {
+  display: grid;
+  grid-template-columns: minmax(260px, 0.9fr) minmax(360px, 1.35fr);
+  gap: 22px;
 }
 
 .image-wrapper {
   position: relative;
+  height: 245px;
+  overflow: hidden;
+  border-radius: 10px;
 }
 
-.modal-image {
-  display: block;
+.image-wrapper img {
   width: 100%;
-  height: 245px;
+  height: 100%;
   object-fit: cover;
-  border-radius: 9px;
 }
 
 .status-badge,
 .verified-badge {
   position: absolute;
-  top: 11px;
-  padding: 5px 7px;
-  font-size: 7px;
+  top: 12px;
+  padding: 5px 8px;
+  font-size: 8px;
   font-weight: 700;
-  border-radius: 10px;
+  border-radius: 12px;
 }
 
 .status-badge {
-  left: 11px;
-  color: #b84343;
-  background: #ffe1e1;
+  left: 12px;
 }
 
 .verified-badge {
-  right: 11px;
-  color: #536158;
-  background: rgba(255, 255, 255, 0.95);
+  right: 12px;
+  color: #526159;
+  background: rgba(255, 255, 255, 0.94);
 }
 
-.soundscape-card {
-  margin-top: 11px;
-  padding: 13px;
-  background: #f8faf8;
-  border: 1px solid #e1e7e3;
-  border-radius: 8px;
+.status-badge.critical {
+  color: #b74646;
+  background: #ffe2e2;
 }
 
-.soundscape-heading {
+.status-badge.endangered {
+  color: #9c5e1c;
+  background: #fff0d5;
+}
+
+.status-badge.vulnerable {
+  color: #267653;
+  background: #dff4e8;
+}
+
+.status-badge.least-concern {
+  color: #35705a;
+  background: #e7f5ed;
+}
+
+.audio-card {
+  margin-top: 12px;
+  padding: 14px;
+  border: 1px solid #dfe7e2;
+  border-radius: 10px;
+}
+
+.audio-heading > div {
   display: flex;
-  margin-bottom: 10px;
-  color: #27704f;
-  font-size: 9px;
+  align-items: center;
   justify-content: space-between;
 }
 
-.soundscape-heading span {
-  color: #7c8781;
+.audio-heading strong {
+  color: #287353;
+  font-size: 11px;
 }
 
-.audio-player {
+.audio-heading span {
+  color: #75817b;
+  font-size: 9px;
+}
+
+.audio-controls {
   display: flex;
-  margin-bottom: 10px;
+  margin-top: 12px;
   align-items: center;
-  gap: 11px;
+  gap: 12px;
 }
 
-.audio-player button {
-  display: grid;
-  width: 30px;
-  height: 30px;
-  flex-shrink: 0;
+.play-button {
+  width: 35px;
+  height: 35px;
   color: #ffffff;
-  place-items: center;
-  background: #2d7a58;
+  background: #287353;
   border: 0;
   border-radius: 50%;
+  cursor: pointer;
 }
 
 .waveform {
   display: flex;
-  height: 26px;
+  height: 28px;
+  flex: 1;
   align-items: center;
+  justify-content: center;
   gap: 4px;
 }
 
 .waveform span {
-  display: block;
   width: 3px;
-  background: #31a171;
-  border-radius: 2px;
+  background: #3a906c;
+  border-radius: 3px;
 }
 
-.soundscape-card p {
-  margin: 0;
-  color: #758079;
-  font-size: 8px;
-  line-height: 1.45;
-}
-
-.modal-right {
-  padding: 6px 5px 0 0;
-}
-
-.title-row {
-  display: flex;
-  padding-right: 25px;
-  align-items: baseline;
-  gap: 8px;
-}
-
-.title-row h2 {
-  margin: 0;
-  color: #205d43;
-  font-size: 25px;
-  font-weight: 700;
-}
-
-.title-row em {
-  color: #77827c;
-  font-family: Georgia, serif;
-  font-size: 9px;
-}
-
-.introduction {
-  margin: 8px 0 14px;
-  color: #69756e;
+.audio-card p {
+  margin: 10px 0 0;
+  color: #6d7973;
   font-size: 10px;
-  line-height: 1.45;
+  line-height: 1.5;
+}
+
+.species-title {
+  padding-right: 32px;
+}
+
+.species-title h2 {
+  margin: 0 0 3px;
+  color: #174b35;
+  font-size: 27px;
+}
+
+.species-title em {
+  color: #7b8680;
+  font-family: Georgia, serif;
+  font-size: 12px;
+}
+
+.summary {
+  margin: 12px 0;
+  color: #5f6d66;
+  font-size: 12px;
+  line-height: 1.55;
 }
 
 .information-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  margin-bottom: 10px;
-  gap: 8px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
 }
 
-.information-grid article {
-  padding: 10px;
+.information-card {
+  display: flex;
+  min-height: 68px;
+  padding: 11px;
+  flex-direction: column;
+  gap: 6px;
   background: #f7f9f7;
-  border: 1px solid #e6ebe8;
-  border-radius: 7px;
+  border: 1px solid #e4e9e5;
+  border-radius: 8px;
 }
 
-.information-grid span,
-.information-grid strong {
-  display: block;
-}
-
-.information-grid span {
-  margin-bottom: 5px;
-  color: #468267;
+.information-card span {
+  color: #79857f;
   font-size: 8px;
   font-weight: 700;
   text-transform: uppercase;
 }
 
-.information-grid strong {
-  color: #4c5b53;
-  font-size: 9px;
+.information-card strong {
+  color: #34483e;
+  font-size: 10px;
+  line-height: 1.35;
 }
 
-.information-grid .critical-text {
-  color: #c04646;
+.information-card strong.critical {
+  color: #c14646;
+}
+
+.information-card strong.endangered {
+  color: #a06522;
+}
+
+.information-card strong.vulnerable,
+.information-card strong.least-concern {
+  color: #287353;
 }
 
 .why-card,
 .fact-card {
+  margin-top: 10px;
   padding: 11px;
-  border-radius: 7px;
+  border-radius: 8px;
 }
 
 .why-card {
-  margin-bottom: 9px;
   background: #f7f9f7;
-  border: 1px solid #e5eae7;
+  border: 1px solid #e4e9e5;
+}
+
+.fact-card {
+  color: #226347;
+  background: #e7faef;
+  border: 1px solid #bfe8d0;
 }
 
 .why-card span {
-  color: #438064;
+  color: #718079;
   font-size: 8px;
   font-weight: 700;
   text-transform: uppercase;
@@ -391,59 +436,44 @@ const emit = defineEmits(['close'])
 .why-card p,
 .fact-card p {
   margin: 5px 0 0;
-  color: #58675f;
-  font-size: 9px;
+  font-size: 10px;
   line-height: 1.45;
 }
 
-.fact-card {
-  color: #277452;
-  background: #e7f8ef;
-  border: 1px solid #bfe8d1;
-}
-
 .fact-card strong {
-  font-size: 9px;
+  font-size: 10px;
 }
 
 .modal-actions {
   display: flex;
-  margin-top: 11px;
+  margin-top: 13px;
   align-items: center;
   justify-content: space-between;
+  gap: 10px;
 }
 
 .map-button,
-.modal-actions button {
-  padding: 9px 13px;
-  font-size: 9px;
+.secondary-close {
+  padding: 9px 14px;
+  font-size: 10px;
   font-weight: 700;
   border-radius: 6px;
+  cursor: pointer;
 }
 
 .map-button {
   color: #ffffff;
-  text-decoration: none;
-  background: #2d7a58;
+  background: #287353;
+  border: 0;
 }
 
-.modal-actions button {
-  color: #59675f;
+.secondary-close {
+  color: #53625a;
   background: transparent;
   border: 0;
 }
 
 @media (max-width: 720px) {
-  .species-modal {
-    grid-template-columns: 1fr;
-  }
-
-  .modal-image {
-    height: 220px;
-  }
-}
-
-@media (max-width: 480px) {
   .modal-backdrop {
     padding: 12px;
   }
@@ -452,13 +482,16 @@ const emit = defineEmits(['close'])
     padding: 16px;
   }
 
+  .modal-grid {
+    grid-template-columns: 1fr;
+  }
+
   .information-grid {
     grid-template-columns: 1fr;
   }
 
-  .title-row {
-    align-items: flex-start;
-    flex-direction: column;
+  .image-wrapper {
+    height: 220px;
   }
 }
 </style>

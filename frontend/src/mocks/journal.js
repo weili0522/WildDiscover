@@ -1,7 +1,7 @@
 export const journalSummary = {
-  activeInvestigations: 3,
-  savedZones: 5,
-  evidenceSubmitted: 8
+  activeInvestigations: 6,
+  savedZones: 8,
+  evidenceSubmitted: 13
 }
 
 export const investigations = [
@@ -53,13 +53,70 @@ export const investigations = [
     type: 'Grassland Structural Survey',
     status: 'Not Started',
     latestExploration: 'No session logged',
-    zonesExplored: 5,
-    evidenceSubmitted: 4,
+    zonesExplored: 0,
+    evidenceSubmitted: 0,
     savedBoundary: '9.8 km²',
     savedArea: 'Riverina Grasslands Sector 2',
     probability: 76,
     probabilityLevel: 'High Potential',
     image: 'plains-wanderer.jpg',
+    actionLabel: 'Start Exploration'
+  },
+  {
+    id: 'rufous-scrub-bird-investigation',
+    number: '04',
+    speciesId: 'rufous-scrub-bird',
+    commonName: 'Rufous Scrub-bird',
+    scientificName: 'Atrichornis rufescens',
+    category: 'Endangered',
+    type: 'Rainforest Acoustic Survey',
+    status: 'Not Started',
+    latestExploration: 'No session logged',
+    zonesExplored: 0,
+    evidenceSubmitted: 0,
+    savedBoundary: '11.6 km²',
+    savedArea: 'Border Ranges Sector 3',
+    probability: 71,
+    probabilityLevel: 'High Potential',
+    image: 'rufous-scrub-bird.jpg',
+    actionLabel: 'Start Exploration'
+  },
+  {
+    id: 'malleefowl-investigation',
+    number: '05',
+    speciesId: 'malleefowl',
+    commonName: 'Malleefowl',
+    scientificName: 'Leipoa ocellata',
+    category: 'Vulnerable',
+    type: 'Mallee Nest Monitoring',
+    status: 'Not Started',
+    latestExploration: 'No session logged',
+    zonesExplored: 0,
+    evidenceSubmitted: 0,
+    savedBoundary: '18.4 km²',
+    savedArea: 'Murray Mallee Sector 5',
+    probability: 68,
+    probabilityLevel: 'Medium Potential',
+    image: 'malleefowl.jpg',
+    actionLabel: 'Start Exploration'
+  },
+  {
+    id: 'dusky-grasswren-investigation',
+    number: '06',
+    speciesId: 'dusky-grasswren',
+    commonName: 'Dusky Grasswren',
+    scientificName: 'Amytornis purnelli',
+    category: 'Least Concern',
+    type: 'Rocky Range Habitat Survey',
+    status: 'Not Started',
+    latestExploration: 'No session logged',
+    zonesExplored: 0,
+    evidenceSubmitted: 0,
+    savedBoundary: '12.7 km²',
+    savedArea: 'MacDonnell Ranges Sector 6',
+    probability: 59,
+    probabilityLevel: 'Medium Potential',
+    image: 'dusky-grasswren.jpg',
     actionLabel: 'Start Exploration'
   }
 ]
@@ -95,7 +152,8 @@ export const explorationDetail = {
       type: 'audio',
       title: 'Princess Parrot Call Recorded',
       time: '18:42',
-      description: 'Soft chattering call recorded near desert oak habitat',
+      description:
+        'Soft chattering call recorded near desert oak habitat',
       attachment: 'princess_call_01.wav'
     }
   ],

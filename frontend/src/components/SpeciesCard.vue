@@ -15,7 +15,15 @@ const emit = defineEmits([
 
 <template>
   <article class="species-card">
-    <div class="image-wrapper">
+    <div
+      class="image-wrapper"
+      role="button"
+      tabindex="0"
+      :aria-label="`View details for ${species.name}`"
+      @click="emit('view-details', species)"
+      @keydown.enter="emit('view-details', species)"
+      @keydown.space.prevent="emit('view-details', species)"
+    >
       <img
         :src="species.image"
         :alt="species.name"
@@ -109,6 +117,18 @@ const emit = defineEmits([
   position: relative;
   height: 290px;
   overflow: hidden;
+  cursor: pointer;
+}
+
+.species-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.image-wrapper:hover .species-image {
+  transform: scale(1.035);
 }
 
 .species-image {
@@ -144,6 +164,11 @@ const emit = defineEmits([
 .status-badge.vulnerable {
   color: #267653;
   background: #dff4e8;
+}
+
+.status-badge.least-concern {
+  color: #35705a;
+  background: #e7f5ed;
 }
 
 .verified-badge {

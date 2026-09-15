@@ -1,21 +1,26 @@
 <script setup>
 import { computed, ref } from 'vue'
+import { useRouter } from 'vue-router'
 
 import HabitatMap from '../components/HabitatMap.vue'
 import MapControls from '../components/MapControls.vue'
 import MapGuide from '../components/MapGuide.vue'
 import PredictionLegend from '../components/PredictionLegend.vue'
 import SpeciesSelector from '../components/SpeciesSelector.vue'
-import { useRouter } from 'vue-router'
-import {defaultMapFilters, targetSpecies} from '../mocks/mapOptions'
+
+import {
+  defaultMapFilters,
+  targetSpecies
+} from '../mocks/mapOptions'
 
 const router = useRouter()
+
 const mapStep = ref('explore')
-const selectedSpeciesId = ref('night-parrot')
+const selectedSpeciesId = ref(null)
 const selectedPotential = ref(null)
 
 const activeFilters = ref({
-  selectedSpecies: [...defaultMapFilters.selectedSpecies],
+  selectedSpecies: [],
   region: defaultMapFilters.region,
   climateHorizon: defaultMapFilters.climateHorizon,
   probability: defaultMapFilters.probability,
@@ -24,16 +29,28 @@ const activeFilters = ref({
 
 const selectedSpecies = computed(() =>
   targetSpecies.find(
-    (species) => species.id === selectedSpeciesId.value
+    species => species.id === selectedSpeciesId.value
   )
 )
 
-function selectSpecies(speciesId) {
+function selectSpecies(speciesOrId) {
+  const speciesId =
+    typeof speciesOrId === 'string'
+      ? speciesOrId
+      : speciesOrId?.id
+
+  if (!speciesId) return
+
   selectedSpeciesId.value = speciesId
   activeFilters.value.selectedSpecies = [speciesId]
 }
 
 function selectPotential(point) {
+  // The user must choose a species before planning an exploration.
+  if (!selectedSpeciesId.value) {
+    return
+  }
+
   selectedPotential.value = point
 
   if (point.id === 'high') {
@@ -49,14 +66,25 @@ function returnToExplore() {
 function updateFilters(updatedFilters) {
   activeFilters.value = updatedFilters
 
+  if (updatedFilters.selectedSpecies?.length) {
+    selectedSpeciesId.value = updatedFilters.selectedSpecies[0]
+  }
+
   console.log('Mock map filters updated:', updatedFilters)
 }
 
-function saveZone() {
+function saveZone(controlData = {}) {
   const savedZone = {
     species: selectedSpecies.value,
     potential: selectedPotential.value,
-    filters: activeFilters.value,
+    filters: {
+      ...activeFilters.value,
+      ...controlData
+    },
+    explorationDate:
+      controlData.explorationDate ||
+      activeFilters.value.explorationDate ||
+      '18 July 2026',
     savedAt: new Date().toISOString()
   }
 
@@ -70,50 +98,78 @@ function saveZone() {
 </script>
 
 <template>
-  <div class="map-page">
+  <main class="map-page">
     <div class="map-container">
-      <!-- State 1: Explore a Species -->
+      <!-- State 1: Choose a Species -->
       <template v-if="mapStep === 'explore'">
-        <section class="map-heading">
-          <span class="heading-badge">
-            ◉ Habitat Prediction Map
-          </span>
+        <section class="explore-grid">
+          <div class="explore-main">
+            <header class="map-heading">
+              <span class="heading-badge">
+                ◉ Habitat Prediction Map
+              </span>
 
-          <h1>Explore a Species</h1>
+              <h1>Explore a Species</h1>
 
-          <p>
-            Choose a bird to explore its predicted habitat across Australia.
-          </p>
-        </section>
+              <p>
+                Choose a bird to explore its predicted habitat across Australia.
+              </p>
+            </header>
 
-        <SpeciesSelector
-          :selected-species-id="selectedSpeciesId"
-          @select="selectSpecies"
-        />
-
-        <section class="exploration-layout">
-          <div class="map-column">
-            <HabitatMap
-              key="explore-map"
-              mode="explore"
-              @select-potential="selectPotential"
+            <SpeciesSelector
+              v-model="selectedSpeciesId"
+              :species="targetSpecies"
+              @select="selectSpecies"
             />
+
+            <div class="map-column">
+              <HabitatMap
+                key="explore-map"
+                mode="explore"
+                @select-potential="selectPotential"
+              />
+
+              <p
+                v-if="!selectedSpeciesId"
+                class="selection-message"
+              >
+                Select a bird species before choosing a habitat prediction area.
+              </p>
+            </div>
           </div>
 
           <aside class="information-sidebar">
-            <MapGuide :active-step="2" />
+            <MapGuide
+              :active-step="selectedSpeciesId ? 2 : 1"
+            />
+
+            <section class="threshold-card">
+              <div class="threshold-heading">
+                <span>PROBABILITY THRESHOLD</span>
+
+                <strong>
+                  ≥ {{ activeFilters.probability }}%
+                </strong>
+              </div>
+
+              <input
+                v-model.number="activeFilters.probability"
+                class="threshold-slider"
+                type="range"
+                min="0"
+                max="100"
+                step="1"
+                aria-label="Probability threshold"
+              />
+
+              <div class="threshold-labels">
+                <span>Broad Search (0%)</span>
+                <span>High Confidence (≥70%)</span>
+                <span>Strict (100%)</span>
+              </div>
+            </section>
 
             <PredictionLegend />
-
-            <div class="selected-species-card">
-              <span>ACTIVE SPECIES</span>
-
-              <strong>{{ selectedSpecies?.commonName }}</strong>
-
-              <em>{{ selectedSpecies?.scientificName }}</em>
-
-              <small>◎ {{ selectedSpecies?.habitat }}</small>
-            </div>
           </aside>
         </section>
       </template>
@@ -140,11 +196,18 @@ function saveZone() {
               type="button"
               @click="selectSpecies(species.id)"
             >
-              <span v-if="species.id === selectedSpeciesId">✓</span>
+              <span v-if="species.id === selectedSpeciesId">
+                ✓
+              </span>
+
               {{ species.commonName }}
             </button>
 
-            <button class="species-pill" type="button">
+            <button
+              class="species-pill"
+              type="button"
+              @click="returnToExplore"
+            >
               + More Species
             </button>
           </div>
@@ -168,7 +231,7 @@ function saveZone() {
         </section>
       </template>
     </div>
-  </div>
+  </main>
 </template>
 
 <style scoped>
@@ -185,22 +248,37 @@ function saveZone() {
   margin: 0 auto;
 }
 
+/* Explore state */
+
+.explore-grid {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 2.15fr)
+    minmax(280px, 1fr);
+  align-items: start;
+  gap: 24px;
+}
+
+.explore-main {
+  min-width: 0;
+}
+
 .map-heading {
-  margin-bottom: 25px;
+  margin-bottom: 22px;
 }
 
 .heading-badge {
   display: inline-flex;
+  align-items: center;
   margin-bottom: 11px;
   padding: 6px 11px;
+  border-radius: 15px;
+  background: #ccefdc;
   color: #24704f;
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  align-items: center;
-  background: #ccefdc;
-  border-radius: 15px;
 }
 
 .map-heading h1 {
@@ -216,16 +294,31 @@ function saveZone() {
   font-size: 15px;
 }
 
-.exploration-layout {
-  display: grid;
-  grid-template-columns: minmax(0, 2.15fr) minmax(280px, 1fr);
-  margin-top: 18px;
-  align-items: start;
-  gap: 20px;
-}
-
 .map-column {
   min-width: 0;
+}
+
+.explore-main .map-column {
+  position: relative;
+  margin-top: 16px;
+}
+
+.selection-message {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  left: 16px;
+  z-index: 500;
+  margin: 0;
+  padding: 10px 14px;
+  border: 1px solid #dbe7df;
+  border-radius: 8px;
+  background: rgb(255 255 255 / 92%);
+  color: #5a6e63;
+  font-size: 11px;
+  text-align: center;
+  pointer-events: none;
+  backdrop-filter: blur(4px);
 }
 
 .information-sidebar {
@@ -234,59 +327,86 @@ function saveZone() {
   gap: 18px;
 }
 
-.selected-species-card {
-  display: flex;
+/* Probability threshold */
+
+.threshold-card {
   padding: 18px 20px;
-  flex-direction: column;
-  background: #ffffff;
   border: 1px solid #e1e8e3;
   border-radius: 12px;
-  box-shadow: 0 3px 12px rgba(26, 69, 49, 0.05);
+  background: #ffffff;
+  box-shadow: 0 3px 12px rgb(26 69 49 / 5%);
 }
 
-.selected-species-card > span {
-  margin-bottom: 8px;
-  color: #31805e;
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
+.threshold-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  margin-bottom: 10px;
 }
 
-.selected-species-card strong {
-  color: #234d39;
-  font-size: 15px;
-}
-
-.selected-species-card em {
-  margin-top: 3px;
-  color: #6c7871;
-  font-family: Georgia, serif;
-  font-size: 11px;
-}
-
-.selected-species-card small {
-  margin-top: 10px;
-  color: #4e675b;
+.threshold-heading span {
+  color: #53675d;
   font-size: 10px;
-  font-weight: 600;
+  font-weight: 800;
+  letter-spacing: 0.04em;
 }
+
+.threshold-heading strong {
+  padding: 4px 8px;
+  border-radius: 5px;
+  background: #e5f5eb;
+  color: #287b57;
+  font-size: 12px;
+}
+
+.threshold-slider {
+  width: 100%;
+  height: 5px;
+  accent-color: #3478d4;
+  cursor: pointer;
+}
+
+.threshold-labels {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 8px;
+  color: #7b8780;
+  font-size: 8px;
+}
+
+.threshold-labels span {
+  flex: 1;
+}
+
+.threshold-labels span:nth-child(2) {
+  text-align: center;
+}
+
+.threshold-labels span:last-child {
+  text-align: right;
+}
+
+/* Planning state */
 
 .planning-navigation {
   display: flex;
-  margin-bottom: 22px;
   align-items: center;
   justify-content: space-between;
   gap: 20px;
+  margin-bottom: 22px;
 }
 
 .back-button {
   padding: 8px 0;
+  border: 0;
+  background: transparent;
   color: #335648;
   font-size: 12px;
   font-weight: 700;
   text-transform: uppercase;
-  background: transparent;
-  border: 0;
+  cursor: pointer;
 }
 
 .back-button:hover {
@@ -302,27 +422,51 @@ function saveZone() {
 
 .species-pill {
   padding: 8px 13px;
+  border: 0;
+  border-radius: 17px;
+  background: #eef1ef;
   color: #65716a;
   font-size: 10px;
   font-weight: 600;
-  background: #eef1ef;
-  border: 0;
-  border-radius: 17px;
+  cursor: pointer;
+}
+
+.species-pill:hover {
+  background: #e2ebe6;
+  color: #2d684e;
 }
 
 .species-pill.active {
-  color: #ffffff;
   background: #2d7a58;
+  color: #ffffff;
 }
 
 .planning-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1.85fr) minmax(310px, 0.9fr);
+  grid-template-columns:
+    minmax(0, 1.85fr)
+    minmax(310px, 0.9fr);
   align-items: start;
   gap: 20px;
 }
 
+/* Responsive */
+
 @media (max-width: 960px) {
+  .explore-grid,
+  .planning-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .information-sidebar {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .information-sidebar > :first-child {
+    grid-column: 1 / -1;
+  }
+
   .planning-navigation {
     align-items: flex-start;
     flex-direction: column;
@@ -330,10 +474,6 @@ function saveZone() {
 
   .species-pills {
     justify-content: flex-start;
-  }
-
-  .planning-layout {
-    grid-template-columns: 1fr;
   }
 }
 
@@ -350,8 +490,20 @@ function saveZone() {
     grid-template-columns: 1fr;
   }
 
-  .selected-species-card {
+  .information-sidebar > :first-child {
     grid-column: auto;
+  }
+
+  .threshold-labels {
+    font-size: 7px;
+  }
+
+  .species-pills {
+    gap: 6px;
+  }
+
+  .species-pill {
+    padding: 7px 10px;
   }
 }
 </style>
