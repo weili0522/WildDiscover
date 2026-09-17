@@ -165,7 +165,7 @@ const resetQuiz = () => {
 
   color: #1f1f1f;
 
-  font-size: 21px;
+  font-size: 24px;
   font-weight: 600;
 }
 
@@ -179,7 +179,7 @@ const resetQuiz = () => {
 .quiz-question {
   color: #333333;
 
-  font-size: 13px;
+  font-size: 16px;
   line-height: 1.5;
 
   margin-bottom: 18px;
@@ -268,7 +268,7 @@ const resetQuiz = () => {
 .option-text {
   color: #333333;
 
-  font-size: 13px;
+  font-size: 16px;
 }
 
 
@@ -289,7 +289,7 @@ const resetQuiz = () => {
   background-color: #237553;
   color: #ffffff;
 
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 500;
 
   cursor: pointer;
@@ -341,7 +341,7 @@ const resetQuiz = () => {
   background-color: #ffffff;
   color: #2a7b59;
 
-  font-size: 24px;
+  font-size: 27px;
   font-weight: 700;
 }
 
@@ -356,7 +356,7 @@ const resetQuiz = () => {
 
   color: #146c4a;
 
-  font-size: 25px;
+  font-size: 28px;
   font-weight: 700;
 }
 
@@ -375,7 +375,7 @@ const resetQuiz = () => {
 .answer-label {
   color: #666666;
 
-  font-size: 10px;
+  font-size: 13px;
   font-weight: 600;
   letter-spacing: 0.4px;
 
@@ -387,7 +387,7 @@ const resetQuiz = () => {
 
   color: #1f1f1f;
 
-  font-size: 18px;
+  font-size: 21px;
   font-weight: 600;
 
   text-align: center;
@@ -402,7 +402,7 @@ const resetQuiz = () => {
 
   color: #555555;
 
-  font-size: 12px;
+  font-size: 15px;
   line-height: 1.5;
 
   font-style: italic;
@@ -421,7 +421,7 @@ const resetQuiz = () => {
 
   border-radius: 30px;
 
-  font-size: 12px;
+  font-size: 15px;
   font-weight: 500;
 
   text-decoration: none;
@@ -456,7 +456,7 @@ const resetQuiz = () => {
 
   color: #777777;
 
-  font-size: 11px;
+  font-size: 14px;
 
   cursor: pointer;
 }
@@ -474,7 +474,7 @@ const resetQuiz = () => {
   background-color: #f5faf7;
   color: #146c4a;
 
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 600;
   line-height: 1.4;
   text-align: center;

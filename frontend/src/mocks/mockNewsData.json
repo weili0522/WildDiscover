@@ -1,0 +1,52 @@
+[
+  {
+    "id": 1,
+    "source": "WWF Australia",
+    "publishedAt": "September 2024",
+    "category": "Rediscoveries & Sightings",
+    "title": "Breakthrough discovery: Indigenous rangers in outback WA find 50 night parrots",
+    "summary": "Indigenous rangers and researchers have discovered potentially the largest population of Night Parrots in the Ngururrpa Indigenous Protected Area, detecting the birds at 17 of 31 survey sites.",
+    "image": "night-parrot",
+    "externalUrl": "https://wwf.org.au/blogs/breakthrough-discovery-indigenous-rangers-in-outback-wa-find-50-night-parrots"
+  },
+  {
+    "id": 2,
+    "source": "CSIRO",
+    "publishedAt": "February 2024",
+    "category": "Ecosystem Science",
+    "title": "Unlocking the genome of the endangered Night Parrot",
+    "summary": "Scientists have published the first fully annotated genome for the Night Parrot, providing a crucial tool to understand its biology and improve conservation efforts.",
+    "image": "spinifex",
+    "externalUrl": "https://www.csiro.au/en/news/all/articles/2024/february/genome-endangered-night-parrot"
+  },
+  {
+    "id": 3,
+    "source": "ABC News",
+    "publishedAt": "August 2024",
+    "category": "Rediscoveries & Sightings",
+    "title": "Critically endangered night parrots detected in Queensland outback",
+    "summary": "Supported by government funding, conservation groups have successfully recorded Night Parrot calls, significantly expanding the known range of the critically endangered bird.",
+    "image": "night-parrot",
+    "externalUrl": "https://www.abc.net.au/news/2026-04-22/critically-endangered-night-parrots-detected-qld-outback/106587514"
+  },
+  {
+    "id": 4,
+    "source": "Bush Heritage Australia",
+    "publishedAt": "July 2024",
+    "category": "Habitat Protection",
+    "title": "Pullen Pullen protections strengthened",
+    "summary": "Ongoing management at the Pullen Pullen Reserve continues to safeguard Night Parrot populations through intensive feral cat and fox management.",
+    "image": "spinifex",
+    "externalUrl": "https://www.bushheritage.org.au/news/pullen-pullen-protections-strengthened?srsltid=AU7gw4UnjRXJgjmpbbGmOTneA-mpBk_jXz_fCcO1CoaDrULd8om5cfhO"
+  },
+  {
+    "id": 5,
+    "source": "IMOS",
+    "publishedAt": "October 2024",
+    "category": "Policy Updates",
+    "title": "Acoustic telemetry arrays in Queensland",
+    "summary": "Indigenous Desert Alliance and WWF have partnered to deploy massive acoustic sensor networks to identify new spinifex habitats for endangered species.",
+    "image": "sighting-queensland",
+    "externalUrl": "https://imos.org.au/facility/animal-tracking/acoustic-telemetry-arrays-queensland"
+  }
+]

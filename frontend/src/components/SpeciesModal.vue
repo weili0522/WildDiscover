@@ -3,447 +3,514 @@ defineProps({
   visible: {
     type: Boolean,
     default: false
+  },
+species: {
+    type: Object,
+    default: null
+  },
+  playingId: {
+    type: String,
+    default: null
   }
 })
 
-const emit = defineEmits(['close'])
+const emit = defineEmits([
+  'close',
+  'view-map',
+  'listen'
+])
+
+function closeModal() {
+  emit('close')
+}
+
+function handleBackdropClick(event) {
+  if (event.target === event.currentTarget) {
+    closeModal()
+  }
+}
 </script>
 
 <template>
   <Teleport to="body">
     <div
-      v-if="visible"
+      v-if="visible && species"
       class="modal-backdrop"
-      @click.self="emit('close')"
+      role="presentation"
+      @click="handleBackdropClick"
     >
-      <div class="species-modal">
-
-        <!-- Close button -->
+      <article
+        class="species-modal"
+        role="dialog"
+        aria-modal="true"
+        :aria-labelledby="`modal-title-${species.id}`"
+      >
         <button
           class="close-button"
           type="button"
-          aria-label="Close"
-          @click="emit('close')"
+          aria-label="Close details"
+          @click="closeModal"
         >
-          x
+          ×
         </button>
 
-        <!-- Night Parrot image -->
-        <img
-          src="../assets/night-parrot.jpg"
-          alt="Night Parrot"
-          class="modal-image"
-        />
+        <div class="modal-grid">
+          <section class="left-column">
+            <div class="image-wrapper">
+              <img
+                :src="species.image"
+                :alt="species.name"
+              >
 
-        <!-- Modal content -->
-        <div class="modal-content">
-
-          <!-- Title -->
-          <div class="modal-title-row">
-            <div>
-              <h2>Night Parrot</h2>
-
-              <p class="scientific-name">
-                Pezoporus occidentalis
-              </p>
-            </div>
-
-            <span class="status-badge">
-              Critically Endangered
-            </span>
-          </div>
-
-          <!-- Species information -->
-          <div class="species-info-grid">
-
-            <div class="info-item">
-              <span class="info-label">
-                PRIMARY HABITAT
+              <span
+                class="status-badge"
+                :class="species.statusClass"
+              >
+                ● {{ species.status }}
               </span>
 
-              <p>
-                Arid and semi-arid spinifex grasslands
-              </p>
-            </div>
-
-            <div class="info-item">
-              <span class="info-label">
-                BEHAVIOR
+              <span
+                v-if="species.verified"
+                class="verified-badge"
+              >
+                ALA Verified
               </span>
-
-              <p>
-                Strictly nocturnal and ground-dwelling
-              </p>
             </div>
 
-            <div class="info-item">
-              <span class="info-label">
-                DIET
-              </span>
+            <div class="audio-card">
+              <div class="audio-heading">
+                <div>
+                  <strong>♬ Bioacoustic Soundscape</strong>
+                  <span>{{ species.audioDuration }}</span>
+                </div>
+              </div>
+
+              <div class="audio-controls">
+                                <button
+                  type="button"
+                  class="play-button"
+                  @click="emit('listen', species)"
+                >
+                  {{ playingId === species.id ? '■' : '▶' }}
+                </button>
+
+                <div class="waveform" aria-hidden="true">
+                  <span
+                    v-for="(height, index) in [
+                      8, 14, 10, 20, 13, 24, 17,
+                      10, 19, 13, 7, 15, 9
+                    ]"
+                    :key="index"
+                    :style="{ height: `${height}px` }"
+                  />
+                </div>
+              </div>
 
               <p>
-                Seeds of grasses and herbaceous plants
+                Listen to this bird’s distinctive call recorded
+                in its natural habitat.
               </p>
             </div>
+          </section>
 
-          </div>
+          <section class="right-column">
+            <header class="species-title">
+              <div>
+                <h2 :id="`modal-title-${species.id}`">
+                  {{ species.name }}
+                </h2>
 
-          <!-- Did you know -->
-          <div class="did-you-know">
+                <em>{{ species.scientificName }}</em>
+              </div>
+            </header>
 
-            <h3>💡 Did you know?</h3>
-
-            <ul>
-              <li>
-                Often called the “holy grail” of birdwatching due to
-                its extreme rarity and elusive nature.
-              </li>
-
-              <li>
-                They spend their days roosting deep inside dense,
-                tunnel-like spinifex rings.
-              </li>
-            </ul>
-
-          </div>
-
-          <!-- Action -->
-          <div class="modal-actions">
-
-            <RouterLink
-              to="/gallery/night-parrot/sightings"
-              class="sighting-button"
-            >
-              View Sighting Gallery ↗
-            </RouterLink>
-
-            <p>
-              Explore all open-source community sightings of this bird.
+            <p class="summary">
+              {{ species.description }}
             </p>
 
-          </div>
+            <div class="information-grid">
+              <div class="information-card">
+                <span>⚠ Conservation Status</span>
+                <strong :class="species.statusClass">
+                  {{ species.status }}
+                </strong>
+              </div>
 
+              <div class="information-card">
+                <span>♣ Habitat</span>
+                <strong>{{ species.habitat }}</strong>
+              </div>
+
+              <div class="information-card">
+                <span>◷ Active Time</span>
+                <strong>{{ species.activeTime }}</strong>
+              </div>
+
+              <div class="information-card">
+                <span>⌖ Where It Lives</span>
+                <strong>{{ species.location }}</strong>
+              </div>
+            </div>
+
+            <div class="why-card">
+              <span>♧ Why It Matters</span>
+              <p>{{ species.whyItMatters }}</p>
+            </div>
+
+            <div class="fact-card">
+              <strong>Did you know?</strong>
+              <p>{{ species.didYouKnow }}</p>
+            </div>
+
+            
+            <div class="source-attribution">
+              Source: Atlas of Living Australia (ALA) & EPBC Act Database
+            </div>
+
+            <div class="modal-actions">
+              <button
+                class="map-button"
+                type="button"
+                @click="emit('view-map', species)"
+              >
+                ⌖ View on Map
+              </button>
+
+              <button
+                class="secondary-close"
+                type="button"
+                @click="closeModal"
+              >
+                Close
+              </button>
+            </div>
+          </section>
         </div>
-      </div>
+      </article>
     </div>
   </Teleport>
 </template>
 
 <style scoped>
-/* =========================
-   Background overlay
-   ========================= */
-
 .modal-backdrop {
   position: fixed;
-  inset: 0;
   z-index: 2000;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  padding: 30px;
-
-  background-color: rgba(0, 0, 0, 0.55);
+  inset: 0;
+  display: grid;
+  padding: 24px;
+  place-items: center;
+  background: rgba(8, 20, 14, 0.65);
+  backdrop-filter: blur(2px);
 }
-
-
-/* =========================
-   Modal container
-   ========================= */
 
 .species-modal {
   position: relative;
-
-  width: 100%;
-  max-width: 700px;
-  max-height: 90vh;
-
+  width: min(900px, 100%);
+  max-height: calc(100vh - 48px);
+  padding: 22px;
   overflow-y: auto;
-
-  background-color: #ffffff;
-
-  border-radius: 16px;
-
-  box-shadow:
-    0 20px 60px rgba(0, 0, 0, 0.25);
+  background: #ffffff;
+  border-radius: 14px;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.28);
 }
-
-
-/* =========================
-   Close button
-   ========================= */
 
 .close-button {
   position: absolute;
-  top: 14px;
-  right: 14px;
-
-  z-index: 5;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  width: 34px;
-  height: 34px;
-
-  padding: 0;
-
-  border: none;
-  border-radius: 50%;
-
-  background-color: rgba(0, 0, 0, 0.45);
-  color: #ffffff;
-
-  font-size: 24px;
-  font-weight: 300;
+  z-index: 2;
+  top: 12px;
+  right: 15px;
+  width: 32px;
+  height: 32px;
+  color: #65716b;
+  font-size: 28px;
   line-height: 1;
-
+  background: rgba(255, 255, 255, 0.94);
+  border: 0;
+  border-radius: 50%;
   cursor: pointer;
 }
 
-.close-button:hover {
-  background-color: rgba(0, 0, 0, 0.65);
+.modal-grid {
+  display: grid;
+  grid-template-columns: minmax(260px, 0.9fr) minmax(360px, 1.35fr);
+  gap: 22px;
 }
 
+.image-wrapper {
+  position: relative;
+  height: 245px;
+  overflow: hidden;
+  border-radius: 10px;
+}
 
-/* =========================
-   Main image
-   ========================= */
-
-.modal-image {
-  display: block;
-
+.image-wrapper img {
   width: 100%;
-  height: 260px;
-
+  height: 100%;
   object-fit: cover;
-
-  border-radius: 16px 16px 0 0;
 }
 
-
-/* =========================
-   Content
-   ========================= */
-
-.modal-content {
-  padding: 28px 34px 32px;
-}
-
-
-/* =========================
-   Title
-   ========================= */
-
-.modal-title-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  gap: 20px;
-
-  margin-bottom: 28px;
-}
-
-.modal-title-row h2 {
-  margin: 0 0 5px;
-
-  color: #146c4a;
-
-  font-size: 32px;
+.status-badge,
+.verified-badge {
+  position: absolute;
+  top: 12px;
+  padding: 5px 8px;
+  font-size: 11px;
   font-weight: 700;
-}
-
-.scientific-name {
-  margin: 0;
-
-  color: #6b6b6b;
-
-  font-size: 13px;
-  font-style: italic;
+  border-radius: 12px;
 }
 
 .status-badge {
-  flex-shrink: 0;
-
-  display: inline-block;
-
-  padding: 5px 10px;
-
-  border-radius: 20px;
-
-  background-color: #fde5e5;
-  color: #a84848;
-
-  font-size: 10px;
-  font-weight: 600;
+  left: 12px;
 }
 
-
-/* =========================
-   Species information
-   ========================= */
-
-.species-info-grid {
-  display: grid;
-
-  grid-template-columns: 1fr 1fr;
-
-  gap: 22px 36px;
-
-  margin-bottom: 26px;
+.verified-badge {
+  right: 12px;
+  color: #526159;
+  background: rgba(255, 255, 255, 0.94);
 }
 
-.info-item:last-child {
-  grid-column: 1 / 2;
+.status-badge.critical {
+  color: #b74646;
+  background: #ffe2e2;
 }
 
-.info-label {
-  display: block;
-
-  margin-bottom: 6px;
-
-  color: #277654;
-
-  font-size: 10px;
-  font-weight: 700;
-
-  letter-spacing: 0.5px;
+.status-badge.endangered {
+  color: #9c5e1c;
+  background: #fff0d5;
 }
 
-.info-item p {
-  margin: 0;
+.status-badge.vulnerable {
+  color: #267653;
+  background: #dff4e8;
+}
 
-  color: #444444;
+.status-badge.least-concern {
+  color: #35705a;
+  background: #e7f5ed;
+}
 
+.audio-card {
+  margin-top: 12px;
+  padding: 14px;
+  border: 1px solid #dfe7e2;
+  border-radius: 10px;
+}
+
+.audio-heading > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.audio-heading strong {
+  color: #287353;
+  font-size: 14px;
+}
+
+.audio-heading span {
+  color: #75817b;
+  font-size: 12px;
+}
+
+.audio-controls {
+  display: flex;
+  margin-top: 12px;
+  align-items: center;
+  gap: 12px;
+}
+
+.play-button {
+  width: 35px;
+  height: 35px;
+  color: #ffffff;
+  background: #287353;
+  border: 0;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.waveform {
+  display: flex;
+  height: 28px;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.waveform span {
+  width: 3px;
+  background: #3a906c;
+  border-radius: 3px;
+}
+
+.audio-card p {
+  margin: 10px 0 0;
+  color: #6d7973;
   font-size: 13px;
   line-height: 1.5;
 }
 
-
-/* =========================
-   Did you know
-   ========================= */
-
-.did-you-know {
-  margin-bottom: 28px;
-
-  padding: 20px 22px;
-
-  background-color: #e5f5eb;
-
-  border-radius: 10px;
+.species-title {
+  padding-right: 32px;
 }
 
-.did-you-know h3 {
-  margin: 0 0 12px;
-
-  color: #277654;
-
-  font-size: 17px;
-  font-weight: 600;
+.species-title h2 {
+  margin: 0 0 3px;
+  color: #174b35;
+  font-size: 30px;
 }
 
-.did-you-know ul {
-  margin: 0;
-
-  padding-left: 19px;
-
-  color: #3f6f58;
-
-  font-size: 12px;
-  line-height: 1.6;
+.species-title em {
+  color: #7b8680;
+  font-family: Georgia, serif;
+  font-size: 15px;
 }
 
-.did-you-know li + li {
-  margin-top: 8px;
+.summary {
+  margin: 12px 0;
+  color: #5f6d66;
+  font-size: 15px;
+  line-height: 1.55;
 }
 
+.information-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
+}
 
-/* =========================
-   Bottom action
-   ========================= */
+.information-card {
+  display: flex;
+  min-height: 68px;
+  padding: 11px;
+  flex-direction: column;
+  gap: 6px;
+  background: #f7f9f7;
+  border: 1px solid #e4e9e5;
+  border-radius: 8px;
+}
+
+.information-card span {
+  color: #79857f;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.information-card strong {
+  color: #34483e;
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.information-card strong.critical {
+  color: #c14646;
+}
+
+.information-card strong.endangered {
+  color: #a06522;
+}
+
+.information-card strong.vulnerable,
+.information-card strong.least-concern {
+  color: #287353;
+}
+
+.why-card,
+.fact-card {
+  margin-top: 10px;
+  padding: 11px;
+  border-radius: 8px;
+}
+
+.why-card {
+  background: #f7f9f7;
+  border: 1px solid #e4e9e5;
+}
+
+.fact-card {
+  color: #226347;
+  background: #e7faef;
+  border: 1px solid #bfe8d0;
+}
+
+.why-card span {
+  color: #718079;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.why-card p,
+.fact-card p {
+  margin: 5px 0 0;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.fact-card strong {
+  font-size: 13px;
+}
 
 .modal-actions {
-  text-align: center;
+  display: flex;
+  margin-top: 13px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
 }
 
-.sighting-button {
-  display: inline-block;
+.map-button,
+.secondary-close {
+  padding: 9px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  border-radius: 6px;
+  cursor: pointer;
+}
 
-  padding: 11px 24px;
-
-  border-radius: 24px;
-
-  background-color: #146c4a;
+.map-button {
   color: #ffffff;
-
-  font-size: 12px;
-  font-weight: 500;
-
-  text-decoration: none;
-
-  transition: background-color 0.2s ease;
+  background: #287353;
+  border: 0;
 }
 
-.sighting-button:hover {
-  background-color: #0f573c;
-  color: #ffffff;
+.secondary-close {
+  color: #53625a;
+  background: transparent;
+  border: 0;
 }
 
-.modal-actions p {
-  margin: 10px 0 0;
-
-  color: #777777;
-
-  font-size: 10px;
-}
-
-
-/* =========================
-   Responsive
-   ========================= */
-
-@media (max-width: 600px) {
+@media (max-width: 720px) {
   .modal-backdrop {
-    padding: 15px;
+    padding: 12px;
   }
 
   .species-modal {
-    max-height: 95vh;
+    padding: 16px;
   }
 
-  .modal-image {
-    height: 210px;
-  }
-
-  .modal-content {
-    padding: 24px 20px;
-  }
-
-  .modal-title-row {
-    align-items: flex-start;
-
-    flex-direction: column;
-
-    gap: 12px;
-  }
-
-  .modal-title-row h2 {
-    font-size: 27px;
-  }
-
-  .species-info-grid {
+  .modal-grid {
     grid-template-columns: 1fr;
-
-    gap: 18px;
   }
 
-  .info-item:last-child {
-    grid-column: auto;
+  .information-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .image-wrapper {
+    height: 220px;
   }
 }
+
+.source-attribution {
+  margin-top: 16px;
+  margin-bottom: 2px;
+  font-size: 13px;
+  color: #7b8a82;
+  font-style: italic;
+  text-align: right;
+}
+
 </style>

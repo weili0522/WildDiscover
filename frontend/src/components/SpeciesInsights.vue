@@ -100,7 +100,7 @@ const suitabilityPercentage = computed(() => {
 
   color: #1f1f1f;
 
-  font-size: 21px;
+  font-size: 24px;
   font-weight: 600;
 }
 
@@ -126,7 +126,7 @@ const suitabilityPercentage = computed(() => {
 
   color: #555555;
 
-  font-size: 10px;
+  font-size: 13px;
   font-weight: 600;
   letter-spacing: 0.5px;
 }
@@ -136,7 +136,7 @@ const suitabilityPercentage = computed(() => {
 
   color: #333333;
 
-  font-size: 13px;
+  font-size: 16px;
   line-height: 1.4;
 }
 
@@ -149,7 +149,7 @@ const suitabilityPercentage = computed(() => {
 .score {
   color: #146c4a;
 
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 600;
 }
 
@@ -175,7 +175,7 @@ const suitabilityPercentage = computed(() => {
 .condition-text {
   color: #146c4a;
 
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 600;
 }
 </style>
