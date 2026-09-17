@@ -1,6 +1,6 @@
 <script setup>
-import { computed, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { computed, ref, onMounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 
 import HabitatMap from '../components/HabitatMap.vue'
 import MapGuide from '../components/MapGuide.vue'
@@ -13,6 +13,7 @@ import { defaultMapFilters, targetSpecies } from '../mocks/mapOptions'
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'
 
 const router = useRouter()
+const route = useRoute()
 
 const { explorer, isGuest } = useExplorer()
 
@@ -70,6 +71,12 @@ async function confirmSaveZone() {
     alert('Failed to save your journey')
   }
 }
+
+onMounted(() => {
+  if (route.query.species) {
+    selectSpecies(route.query.species)
+  }
+})
 </script>
 
 <template>
