@@ -8,7 +8,7 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js'
 import './style.css'
 
 // --- Quick Security Popup ---
-const EXPECTED_PASSWORD = import.meta.env.VITE_SITE_PASSWORD || 'admin'
+const EXPECTED_PASSWORD = import.meta.env.VITE_SITE_PASSWORD
 
 if (!sessionStorage.getItem('site_auth')) {
   let attempts = 0
