@@ -74,7 +74,8 @@ The platform explores how species such as Australia’s Night Parrot—once beli
 The application is automatically built and distributed via a GitHub-connected Continuous Deployment (CI/CD) pipeline, completely eliminating manual server uploads.
 
 * **Frontend Hosting (Vercel)**: The Vue.js interface automatically builds upon pushes to `main`.
-* **Unified Hosting (Render)**: Both the backend (FastAPI Web Service) and frontend (Vue.js Static Site) are unified under the Render platform. The platform detects webhook pings from GitHub and redeploys the services automatically with zero downtime.
+* **Unified Hosting Strategy**: The backend (FastAPI Web Service) is hosted on Render, handling heavy geospatial processing. The frontend (Vue.js) is seamlessly deployed on Vercel to leverage Edge network performance.
   
 * **Iteration Archiving**: The exact codebase delivered at the end of each academic sprint is locked using a Git tag (e.g., `tag: iteration-2`). This specific branch is mapped to a preserved, iteration-specific URL, while the `main` branch continues to deploy to the live production URL.
 
+* **Access Control (Stakeholder Protection)**: To protect academic integrity during development, pre-release iteration deployments are secured via **Vercel Edge Middleware**. This ensures a true HTTP Basic Auth layer intercepts unauthorized visitors before any client code is loaded, keeping work entirely private.
