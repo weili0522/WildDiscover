@@ -76,14 +76,14 @@ const predictionLevels = [
 .legend-header h2 {
   margin: 0;
   color: #33463c;
-  font-size: 14px;
+  font-size: 17px;
   font-weight: 700;
 }
 
 .accessible-label {
   padding: 4px 7px;
   color: #587368;
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 600;
   white-space: nowrap;
   background: #eef5f1;
@@ -93,7 +93,7 @@ const predictionLevels = [
 .legend-description {
   margin-bottom: 16px;
   color: #7a857f;
-  font-size: 10px;
+  font-size: 13px;
   line-height: 1.5;
 }
 
@@ -143,19 +143,19 @@ const predictionLevels = [
 
 .legend-item strong {
   color: #3e4d45;
-  font-size: 11px;
+  font-size: 14px;
 }
 
 .legend-item small {
   margin-top: 3px;
   color: #78837d;
-  font-size: 8px;
+  font-size: 11px;
 }
 
 .probability-range {
   margin-top: 5px;
   color: #66736c;
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 600;
 }
 </style>

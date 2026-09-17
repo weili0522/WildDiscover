@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, ref, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
 
 import SpeciesCard from '../components/SpeciesCard.vue'
@@ -18,11 +18,13 @@ import malleefowlImage from '../assets/malleefowl.jpg'
 import duskyGrasswrenImage from '../assets/dusky-grasswren.jpg'
 
 const router = useRouter()
+import { useExplorer } from '../composables/useExplorer'
+import { useAudio } from '../composables/useAudio'
+const { isGuest } = useExplorer()
+const { currentlyPlayingId, playAudio, stopAudio } = useAudio()
 
-const searchTerm = ref('')
 const selectedFilter = ref('all')
 const selectedSpecies = ref(null)
-const activeAudioId = ref(null)
 
 const imageMap = {
   'night-parrot.jpg': nightParrotImage,
@@ -41,29 +43,18 @@ const speciesWithImages = computed(() =>
 )
 
 const filteredSpecies = computed(() => {
-  const normalizedSearch = searchTerm.value
-    .trim()
-    .toLowerCase()
-
   return speciesWithImages.value.filter((species) => {
-    const matchesSearch =
-      !normalizedSearch ||
-      species.name.toLowerCase().includes(normalizedSearch) ||
-      species.scientificName
-        .toLowerCase()
-        .includes(normalizedSearch)
-
-    const matchesFilter =
-      selectedFilter.value === 'all' ||
-      species.statusClass === selectedFilter.value
-
-    return matchesSearch && matchesFilter
+    return selectedFilter.value === 'all' || species.statusClass === selectedFilter.value
   })
 })
 
 function viewDetails(species) {
   selectedSpecies.value = species
 }
+
+onBeforeUnmount(() => {
+  stopAudio()
+})
 
 function viewOnMap(species) {
   router.push({
@@ -75,12 +66,7 @@ function viewOnMap(species) {
 }
 
 function listenToCall(species) {
-  activeAudioId.value =
-    activeAudioId.value === species.id
-      ? null
-      : species.id
-
-  console.log('Mock bird call selected:', species.name)
+  playAudio(species.id)
 }
 </script>
 
@@ -101,18 +87,7 @@ function listenToCall(species) {
           </p>
         </div>
 
-        <div class="header-actions">
-          <label class="search-box">
-            <span>⌕</span>
-
-            <input
-              v-model="searchTerm"
-              type="search"
-              placeholder="Search birds..."
-              aria-label="Search birds"
-            >
-          </label>
-        </div>
+        
       </section>
 
       <section class="challenge-banner">
@@ -132,12 +107,18 @@ function listenToCall(species) {
           </p>
         </div>
 
+        
+        <div v-if="isGuest" class="guest-lock">
+          <span class="lock-icon">🔒</span> Log in to play Guess the Bird
+        </div>
         <button
+          v-else
           type="button"
           @click="router.push('/gallery/challenge')"
         >
           Try the Challenge →
         </button>
+
       </section>
 
       <section class="filter-row">
@@ -176,7 +157,8 @@ function listenToCall(species) {
     <SpeciesModal
       :visible="Boolean(selectedSpecies)"
       :species="selectedSpecies"
-      @close="selectedSpecies = null"
+      :playing-id="currentlyPlayingId"
+      @close="selectedSpecies = null; stopAudio()"
       @view-map="viewOnMap"
       @listen="listenToCall"
     />
@@ -208,7 +190,7 @@ function listenToCall(species) {
   display: inline-block;
   margin-bottom: 8px;
   color: #2e805d;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 700;
   text-transform: uppercase;
 }
@@ -216,7 +198,7 @@ function listenToCall(species) {
 .gallery-header h1 {
   margin: 0 0 6px;
   color: #174b35;
-  font-size: 34px;
+  font-size: 37px;
   font-weight: 700;
 }
 
@@ -224,39 +206,13 @@ function listenToCall(species) {
   max-width: 650px;
   margin: 0;
   color: #68756e;
-  font-size: 12px;
+  font-size: 15px;
   line-height: 1.5;
 }
 
-.header-actions {
-  display: flex;
-  width: 320px;
-  flex-direction: column;
-  gap: 10px;
-}
 
-.search-box {
-  display: flex;
-  padding: 0 11px;
-  align-items: center;
-  gap: 7px;
-  background: #ffffff;
-  border: 1px solid #dfe6e1;
-  border-radius: 18px;
-}
 
-.search-box span {
-  color: #7d8782;
-}
 
-.search-box input {
-  width: 100%;
-  padding: 9px 0;
-  font-size: 10px;
-  outline: none;
-  background: transparent;
-  border: 0;
-}
 
 .challenge-banner {
   display: grid;
@@ -281,7 +237,7 @@ function listenToCall(species) {
   width: 40px;
   height: 40px;
   color: #226c4e;
-  font-size: 18px;
+  font-size: 21px;
   place-items: center;
   background: #b9f0d1;
   border-radius: 50%;
@@ -295,14 +251,14 @@ function listenToCall(species) {
 
 .challenge-title h2 {
   margin: 0;
-  font-size: 17px;
+  font-size: 20px;
   font-weight: 700;
 }
 
 .challenge-title span {
   padding: 4px 7px;
   color: #c9f4dd;
-  font-size: 7px;
+  font-size: 10px;
   font-weight: 700;
   text-transform: uppercase;
   border: 1px solid rgba(201, 244, 221, 0.45);
@@ -313,14 +269,14 @@ function listenToCall(species) {
   max-width: 620px;
   margin: 5px 0 0;
   color: #dcebe4;
-  font-size: 9px;
+  font-size: 12px;
   line-height: 1.45;
 }
 
 .challenge-banner > button {
   padding: 10px 15px;
   color: #226247;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 700;
   background: #c9f4dd;
   border: 0;
@@ -338,7 +294,7 @@ function listenToCall(species) {
 .filter-button {
   padding: 7px 11px;
   color: #66736c;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 600;
   background: transparent;
   border: 0;
@@ -380,10 +336,7 @@ function listenToCall(species) {
     flex-direction: column;
   }
 
-  .header-actions {
-    width: 100%;
-  }
-
+  
   .challenge-banner {
     grid-template-columns: 42px 1fr;
   }
@@ -401,5 +354,19 @@ function listenToCall(species) {
   .species-grid {
     grid-template-columns: 1fr;
   }
+}
+</style><style scoped>
+.guest-lock {
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 20px;
+  background: #f0f4f2;
+  color: #555;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 17px;
+}
+.lock-icon {
+  margin-right: 8px;
 }
 </style>

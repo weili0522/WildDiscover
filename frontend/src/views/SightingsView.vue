@@ -72,7 +72,7 @@ const sightings = [
 
   color: #277654;
 
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 500;
 
   text-decoration: none;
@@ -91,7 +91,7 @@ const sightings = [
 
   color: #1f1f1f;
 
-  font-size: 40px;
+  font-size: 43px;
   font-weight: 700;
 }
 
@@ -102,7 +102,7 @@ const sightings = [
 
   color: #666666;
 
-  font-size: 14px;
+  font-size: 17px;
   line-height: 1.6;
 }
 
@@ -126,7 +126,7 @@ const sightings = [
   }
 
   .page-header h1 {
-    font-size: 32px;
+    font-size: 35px;
   }
 
   .sightings-grid {

@@ -1,5 +1,7 @@
 <script setup>
-import leaderboardData from '../mocks/mockLeaderboardData.json'
+import { ref, onMounted } from 'vue'
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'
 
 const rankBadges = {
   1: '🥇',
@@ -7,12 +9,21 @@ const rankBadges = {
   3: '🥉'
 }
 
+const leaderboardUsers = ref([])
+
+onMounted(async () => {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/v1/leaderboard`)
+    if (res.ok) {
+      leaderboardUsers.value = await res.json()
+    }
+  } catch (e) {
+    console.error('Failed to fetch leaderboard', e)
+  }
+})
+
 function getRankBadge(rank) {
   return rankBadges[rank] || rank
-}
-
-function getProgress(points, target) {
-  return Math.min(Math.round((points / target) * 100), 100)
 }
 </script>
 
@@ -31,38 +42,30 @@ function getProgress(points, target) {
       <div class="trophy" aria-hidden="true">🏆</div>
     </header>
 
-    <p class="update-label">
-      How are rankings calculated?
-      <span
-        class="info"
-        title="Rankings are based on mock contribution points during Iteration 2."
-      >
-        ?
-      </span>
-    </p>
+    
 
     <ol class="ranking-list">
       <li
-        v-for="user in leaderboardData.users"
-        :key="user.displayName"
+        v-for="(user, index) in leaderboardUsers"
+        :key="user.id"
         class="ranking-item"
-        :class="{ 'top-three': user.rank <= 3 }"
+        :class="{ 'top-three': (index + 1) <= 3 }"
       >
         <div
           class="rank-number"
-          :class="`rank-${user.rank}`"
-          :aria-label="`Rank ${user.rank}`"
+          :class="`rank-${index + 1}`"
+          :aria-label="`Rank ${index + 1}`"
         >
-          {{ getRankBadge(user.rank) }}
+          {{ getRankBadge(index + 1) }}
         </div>
 
         <div class="explorer-avatar">
-          {{ user.displayName.slice(-2) }}
+          {{ user.username ? user.username.slice(-2).toUpperCase() : "??" }}
         </div>
 
         <div class="explorer-details">
-          <strong>{{ user.displayName }}</strong>
-          <span>{{ user.level }}</span>
+          <strong>{{ user.username }}</strong>
+          <span>Explorer</span>
         </div>
 
         <strong class="points">
@@ -71,67 +74,7 @@ function getProgress(points, target) {
       </li>
     </ol>
 
-    <section class="current-user-section">
-      <div class="current-user-heading">
-        <span>YOUR RANK</span>
-        <span class="percentile">
-          {{ leaderboardData.currentUser.percentile }}
-        </span>
-      </div>
-
-      <div class="current-user-card">
-        <div class="current-rank">
-          {{ leaderboardData.currentUser.rank }}
-        </div>
-
-        <div class="explorer-avatar current-avatar">
-          {{ leaderboardData.currentUser.displayName.slice(-2) }}
-        </div>
-
-        <div class="explorer-details">
-          <strong>{{ leaderboardData.currentUser.displayName }}</strong>
-          <span>{{ leaderboardData.currentUser.level }}</span>
-        </div>
-
-        <strong class="points">
-          {{ leaderboardData.currentUser.points.toLocaleString() }} pts
-        </strong>
-      </div>
-
-      <div class="progress-header">
-        <span>Progress to Trail Scout</span>
-        <strong>
-          {{ leaderboardData.currentUser.points }} /
-          {{ leaderboardData.currentUser.nextRankPoints }} pts
-        </strong>
-      </div>
-
-      <div
-        class="progress-track"
-        role="progressbar"
-        :aria-valuenow="leaderboardData.currentUser.points"
-        aria-valuemin="0"
-        :aria-valuemax="leaderboardData.currentUser.nextRankPoints"
-      >
-        <div
-          class="progress-value"
-          :style="{
-            width: `${getProgress(
-              leaderboardData.currentUser.points,
-              leaderboardData.currentUser.nextRankPoints
-            )}%`
-          }"
-        ></div>
-      </div>
-
-      <p class="points-needed">
-        {{
-          leaderboardData.currentUser.nextRankPoints -
-          leaderboardData.currentUser.points
-        }}
-        points needed to reach the next level
-      </p>
-    </section>
+    
   </aside>
 </template>
 
@@ -163,7 +106,7 @@ function getProgress(points, target) {
 .title-row h2 {
   margin: 0;
   color: #244336;
-  font-size: 17px;
+  font-size: 20px;
 }
 
 .top-badge {
@@ -171,14 +114,14 @@ function getProgress(points, target) {
   border-radius: 14px;
   background: #e5f7ed;
   color: #267a57;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 800;
 }
 
 .leaderboard-header p {
   margin: 7px 0 0;
   color: #7a8881;
-  font-size: 10px;
+  font-size: 13px;
   line-height: 1.4;
 }
 
@@ -190,14 +133,14 @@ function getProgress(points, target) {
   place-items: center;
   border-radius: 10px;
   background: #fff4d8;
-  font-size: 18px;
+  font-size: 21px;
 }
 
 .update-label {
   margin: 0;
   padding: 0 18px 13px;
   color: #4a6658;
-  font-size: 10px;
+  font-size: 13px;
   font-weight: 700;
 }
 
@@ -244,7 +187,7 @@ function getProgress(points, target) {
   border-radius: 50%;
   background: #eef1ef;
   color: #56675f;
-  font-size: 10px;
+  font-size: 13px;
   font-weight: 800;
 }
 
@@ -252,7 +195,7 @@ function getProgress(points, target) {
 .rank-2,
 .rank-3 {
   background: transparent;
-  font-size: 17px;
+  font-size: 20px;
 }
 
 .explorer-avatar {
@@ -263,7 +206,7 @@ function getProgress(points, target) {
   border-radius: 50%;
   background: #e2eee8;
   color: #277a56;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 800;
 }
 
@@ -276,7 +219,7 @@ function getProgress(points, target) {
 .explorer-details strong {
   overflow: hidden;
   color: #2c4539;
-  font-size: 10px;
+  font-size: 13px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -284,14 +227,14 @@ function getProgress(points, target) {
 .explorer-details span {
   overflow: hidden;
   color: #849088;
-  font-size: 8px;
+  font-size: 11px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .points {
   color: #294b3c;
-  font-size: 9px;
+  font-size: 12px;
   white-space: nowrap;
 }
 
@@ -307,7 +250,7 @@ function getProgress(points, target) {
   justify-content: space-between;
   margin-bottom: 9px;
   color: #307a59;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 900;
   letter-spacing: 0.07em;
 }
@@ -332,7 +275,7 @@ function getProgress(points, target) {
 
 .current-rank {
   color: #225d43;
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 900;
 }
 
@@ -346,7 +289,7 @@ function getProgress(points, target) {
   gap: 10px;
   margin-top: 12px;
   color: #5e7067;
-  font-size: 8px;
+  font-size: 11px;
 }
 
 .progress-track {
@@ -366,7 +309,7 @@ function getProgress(points, target) {
 .points-needed {
   margin: 7px 0 0;
   color: #809087;
-  font-size: 8px;
+  font-size: 11px;
   text-align: right;
 }
 

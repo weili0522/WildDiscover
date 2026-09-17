@@ -249,7 +249,7 @@ onBeforeUnmount(() => {
 .selector-label {
   margin: 0 0 7px;
   color: #52675c;
-  font-size: 10px;
+  font-size: 13px;
   font-weight: 900;
   letter-spacing: 0.06em;
 }
@@ -307,7 +307,7 @@ onBeforeUnmount(() => {
 .placeholder-content strong,
 .option-content strong {
   color: #2c4137;
-  font-size: 13px;
+  font-size: 16px;
 }
 
 .selected-content em,
@@ -315,7 +315,7 @@ onBeforeUnmount(() => {
   overflow: hidden;
   color: #76837c;
   font-family: Georgia, serif;
-  font-size: 10px;
+  font-size: 13px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -328,18 +328,18 @@ onBeforeUnmount(() => {
   border-radius: 6px;
   background: #f0f2ef;
   color: #65736c;
-  font-size: 11px;
+  font-size: 14px;
 }
 
 .placeholder-content small,
 .option-content small {
   color: #849089;
-  font-size: 9px;
+  font-size: 12px;
 }
 
 .chevron {
   color: #52665c;
-  font-size: 21px;
+  font-size: 24px;
   transition: transform 0.2s ease;
 }
 
@@ -389,13 +389,13 @@ onBeforeUnmount(() => {
 .option-arrow {
   padding-right: 7px;
   color: #779087;
-  font-size: 18px;
+  font-size: 21px;
 }
 
 .status-code {
   padding: 2px 5px;
   border-radius: 4px;
-  font-size: 8px;
+  font-size: 11px;
   font-style: normal;
   font-weight: 900;
 }

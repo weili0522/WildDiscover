@@ -90,7 +90,7 @@ export const habitatPotentialPoints = [
   {
     id: 'high',
     level: 'High Potential',
-    probability: 82,
+    probability: 88,
     location: 'Fortescue Basin Swale',
     latitude: -22.35,
     longitude: 118.89
@@ -98,7 +98,7 @@ export const habitatPotentialPoints = [
   {
     id: 'medium',
     level: 'Medium Potential',
-    probability: 54,
+    probability: 65,
     location: 'Hamersley Foothills',
     latitude: -22.52,
     longitude: 118.55
@@ -117,7 +117,7 @@ export const defaultMapFilters = {
   selectedSpecies: ['night-parrot'],
   region: 'WA',
   climateHorizon: 'current',
-  probability: 68,
+  probability: 0,
   selectedLayers: [
     'vegetation',
     'elevation',

@@ -1,22 +1,44 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useExplorer } from '../composables/useExplorer'
 
 const router = useRouter()
-const { explorer, startExplorerSession } = useExplorer()
+const { explorer, registerAndLogin, login, startGuestSession } = useExplorer()
 
 const currentStep = ref(explorer.value ? 'ready' : 'welcome')
 const isGenerating = ref(false)
+const isSignInMode = ref(false)
 
-function continueAsExplorer() {
+const generatedUsername = ref('')
+const password = ref('')
+
+onMounted(() => {
+  generatedUsername.value = `Explorer_${Math.floor(1000 + Math.random() * 9000)}`
+})
+
+async function handleAuth() {
+  if (!password.value) return alert('Please enter a password')
+  if (isSignInMode.value && !generatedUsername.value) return alert('Please enter your username')
+  
   isGenerating.value = true
-
-  window.setTimeout(() => {
-    startExplorerSession()
+  try {
+    if (isSignInMode.value) {
+      await login(generatedUsername.value, password.value)
+    } else {
+      await registerAndLogin(generatedUsername.value, password.value)
+    }
     currentStep.value = 'ready'
+  } catch (e) {
+    alert('Authentication failed. Please check your credentials.')
+  } finally {
     isGenerating.value = false
-  }, 700)
+  }
+}
+
+function handleGuest() {
+  startGuestSession()
+  router.push('/map')
 }
 
 function startExploring() {
@@ -27,98 +49,73 @@ function startExploring() {
 <template>
   <section class="onboarding-page">
     <div class="onboarding-container">
-      <!-- Welcome screen -->
       <div v-if="currentStep === 'welcome'" class="onboarding-card">
         <div class="brand-icon">W</div>
-
         <p class="eyebrow">PRIVATE EXPLORATION</p>
-
         <h1>Welcome to WildDiscover</h1>
-
         <p class="subtitle">
           Explore birds, save your journeys and join the community
           while keeping your identity private.
         </p>
 
-        <div class="feature-grid">
-          <article class="feature-item">
-            <div class="feature-icon">◌</div>
-            <h2>Stay Anonymous</h2>
-            <p>No personal information, email or password is required.</p>
-          </article>
-
-          <article class="feature-item">
-            <div class="feature-icon">⌖</div>
-            <h2>Save Your Journeys</h2>
-            <p>Keep a private record of the birds and places you explore.</p>
-          </article>
-
-          <article class="feature-item">
-            <div class="feature-icon">♧</div>
-            <h2>Join the Community</h2>
-            <p>Share discoveries and contribute without revealing your identity.</p>
-          </article>
+        <div class="auth-form">
+          <div class="form-group">
+            <label>{{ isSignInMode ? 'Your Username' : 'Your Auto-Generated Username' }}</label>
+            <input 
+              type="text" 
+              v-model="generatedUsername" 
+              :disabled="!isSignInMode" 
+              class="auth-input" 
+              :class="{ 'disabled-input': !isSignInMode }" 
+              placeholder="Enter your username"
+            />
+          </div>
+          <div class="form-group">
+            <label>{{ isSignInMode ? 'Your Password' : 'Set a Password' }}</label>
+            <input type="password" v-model="password" placeholder="Enter your secure password" class="auth-input" />
+          </div>
         </div>
 
-        <button
-          class="continue-button"
-          type="button"
-          :disabled="isGenerating"
-          @click="continueAsExplorer"
-        >
-          {{ isGenerating ? 'Generating cryptographic session…' : 'Continue as an Explorer' }}
-        </button>
+        <div class="action-buttons">
+          <button
+            class="continue-button"
+            type="button"
+            :disabled="isGenerating || !password"
+            @click="handleAuth"
+          >
+            {{ isGenerating ? (isSignInMode ? 'Signing In...' : 'Creating Account...') : (isSignInMode ? 'Sign In' : 'Create Account') }}
+          </button>
+          
+          <button class="toggle-mode-button" type="button" @click="isSignInMode = !isSignInMode">
+            {{ isSignInMode ? "Need an account? Create one" : "Already have an account? Sign in" }}
+          </button>
+          
+          <button class="guest-button" type="button" @click="handleGuest">
+            Continue as Guest
+          </button>
+        </div>
 
-        <p class="account-note">No email or password needed</p>
-
-        <p class="protocol-note">
-          Compliant with zero-knowledge open citizen science protocols · v2.4
-        </p>
+        <p class="account-note" v-if="!isSignInMode">No email needed. Keep your password safe!</p>
       </div>
 
-      <!-- Explorer-ready screen -->
       <div v-else class="onboarding-card ready-card">
         <div class="success-icon">✓</div>
-
-        <p class="eyebrow">ANONYMOUS SESSION CREATED</p>
-
+        <p class="eyebrow">{{ isSignInMode ? "LOGGED IN" : "ACCOUNT CREATED" }}</p>
         <h1>You’re Ready to Explore!</h1>
-
-        <p class="subtitle">
-          Your anonymous WildDiscover identity is ready.
-        </p>
-
+        <p class="subtitle">Your anonymous WildDiscover identity is ready.</p>
         <div class="explorer-profile">
           <div class="avatar">E</div>
-
           <div>
             <strong>{{ explorer?.displayName }}</strong>
             <span>{{ explorer?.level }}</span>
           </div>
         </div>
-
         <ul class="readiness-list">
-          <li>
-            <span>✓</span>
-            Journal ready
-          </li>
-
-          <li>
-            <span>✓</span>
-            Community ready
-          </li>
-
-          <li>
-            <span>✓</span>
-            Contribution points ready
-          </li>
+          <li><span>✓</span> Journal ready</li>
+          <li><span>✓</span> Community ready</li>
+          <li><span>✓</span> Contribution points ready</li>
         </ul>
-
-        <button
-          class="continue-button"
-          type="button"
-          @click="startExploring"
-        >
+        <button class="continue-button" type="button" @click="startExploring">
           Start Exploring
         </button>
       </div>
@@ -157,7 +154,7 @@ function startExploring() {
   height: 64px;
   margin: 0 auto 20px;
   color: #ffffff;
-  font-size: 28px;
+  font-size: 31px;
   font-weight: 700;
   place-items: center;
   background: #146c4a;
@@ -171,7 +168,7 @@ function startExploring() {
 .eyebrow {
   margin-bottom: 10px;
   color: #2f8f63;
-  font-size: 12px;
+  font-size: 15px;
   font-weight: 700;
   letter-spacing: 0.15em;
 }
@@ -187,7 +184,7 @@ h1 {
   max-width: 650px;
   margin: 0 auto 36px;
   color: #637069;
-  font-size: 17px;
+  font-size: 20px;
   line-height: 1.7;
 }
 
@@ -209,20 +206,20 @@ h1 {
 .feature-icon {
   margin-bottom: 16px;
   color: #146c4a;
-  font-size: 30px;
+  font-size: 33px;
 }
 
 .feature-item h2 {
   margin-bottom: 8px;
   color: #173d2d;
-  font-size: 17px;
+  font-size: 20px;
   font-weight: 700;
 }
 
 .feature-item p {
   margin: 0;
   color: #6d7872;
-  font-size: 14px;
+  font-size: 17px;
   line-height: 1.6;
 }
 
@@ -248,13 +245,13 @@ h1 {
 .account-note {
   margin: 14px 0 0;
   color: #637069;
-  font-size: 13px;
+  font-size: 16px;
 }
 
 .protocol-note {
   margin: 36px 0 0;
   color: #929b96;
-  font-size: 12px;
+  font-size: 15px;
 }
 
 .explorer-profile {
@@ -294,7 +291,7 @@ h1 {
 .explorer-profile span {
   margin-top: 3px;
   color: #6d7872;
-  font-size: 13px;
+  font-size: 16px;
 }
 
 .readiness-list {
@@ -336,5 +333,64 @@ h1 {
     width: 100%;
     min-width: 0;
   }
+}
+
+.auth-form {
+  max-width: 320px;
+  margin: 0 auto 30px;
+  text-align: left;
+}
+.form-group {
+  margin-bottom: 16px;
+}
+.form-group label {
+  display: block;
+  font-size: 16px;
+  color: #637069;
+  margin-bottom: 6px;
+  font-weight: bold;
+}
+.auth-input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #dce4df;
+  border-radius: 8px;
+  font-size: 18px;
+}
+.disabled-input {
+  background: #f5f8f5;
+  color: #173d2d;
+  font-weight: bold;
+}
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 320px;
+  margin: 0 auto;
+}
+.guest-button {
+  padding: 14px 26px;
+  color: #146c4a;
+  font-weight: 600;
+  background: transparent;
+  border: 1px solid #146c4a;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.guest-button:hover {
+  background: #f5f8f5;
+}
+
+</style><style scoped>
+.toggle-mode-button {
+  background: transparent;
+  border: none;
+  color: #173d2d;
+  font-weight: 500;
+  cursor: pointer;
+  margin-top: 8px;
+  text-decoration: underline;
+  font-size: 17px;
 }
 </style>

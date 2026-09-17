@@ -78,7 +78,7 @@ defineProps({
 
   color: #333333;
 
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 600;
 }
 
@@ -91,7 +91,7 @@ defineProps({
 
   color: #277654;
 
-  font-size: 12px;
+  font-size: 15px;
   font-weight: 600;
 }
 
@@ -100,7 +100,7 @@ defineProps({
 
   color: #1f1f1f;
 
-  font-size: 20px;
+  font-size: 23px;
   font-weight: 600;
 
   line-height: 1.25;
@@ -116,6 +116,6 @@ defineProps({
 .date {
   color: #555555;
 
-  font-size: 12px;
+  font-size: 15px;
 }
 </style>

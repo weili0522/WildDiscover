@@ -1,7 +1,14 @@
 <script setup>
+import { useRouter } from 'vue-router'
 import { useExplorer } from '../composables/useExplorer'
 
-const { explorer, hasExplorerSession } = useExplorer()
+const router = useRouter()
+const { explorer, hasExplorerSession, clearExplorerSession } = useExplorer()
+
+function handleLogout() {
+  clearExplorerSession()
+  router.push('/')
+}
 </script>
 
 <template>
@@ -96,10 +103,13 @@ const { explorer, hasExplorerSession } = useExplorer()
             <!-- Generated explorer identity -->
             <li v-else class="identity-control explorer-control">
               <span class="status-dot"></span>
+              <span>{{ explorer?.displayName }}</span>
+            </li>
 
-              <span>
-                {{ explorer?.displayName }}
-              </span>
+            <li v-if="hasExplorerSession" class="nav-item">
+              <button class="nav-link logout-btn" @click="handleLogout">
+                Logout
+              </button>
             </li>
 
             <li class="nav-item">
@@ -137,7 +147,7 @@ const { explorer, hasExplorerSession } = useExplorer()
   min-height: 48px;
   padding-top: 10px;
   padding-bottom: 10px;
-  font-size: 13px;
+  font-size: 16px;
   line-height: 1.5;
   text-align: center;
   align-items: center;
@@ -152,7 +162,7 @@ const { explorer, hasExplorerSession } = useExplorer()
   position: absolute;
   right: 24px;
   color: #dce9e3;
-  font-size: 22px;
+  font-size: 25px;
   line-height: 1;
   background: transparent;
   border: 0;
@@ -165,7 +175,7 @@ const { explorer, hasExplorerSession } = useExplorer()
 
 .navbar-brand {
   color: #146c4a;
-  font-size: 24px;
+  font-size: 27px;
   font-weight: 700;
   text-decoration: none;
 }
@@ -177,7 +187,7 @@ const { explorer, hasExplorerSession } = useExplorer()
 .nav-link {
   position: relative;
   color: #333333;
-  font-size: 15px;
+  font-size: 18px;
   font-weight: 500;
   padding: 23px 0 18px !important;
 }
@@ -210,7 +220,7 @@ const { explorer, hasExplorerSession } = useExplorer()
   display: flex;
   padding: 0 10px;
   color: #68736d;
-  font-size: 12px;
+  font-size: 15px;
   align-items: center;
   gap: 7px;
 }
@@ -227,7 +237,7 @@ const { explorer, hasExplorerSession } = useExplorer()
 .generate-button {
   padding: 7px 14px;
   color: #ffffff;
-  font-size: 12px;
+  font-size: 15px;
   font-weight: 600;
   text-decoration: none;
   white-space: nowrap;
@@ -243,7 +253,7 @@ const { explorer, hasExplorerSession } = useExplorer()
 .explorer-control {
   padding: 8px 14px;
   color: #245c47;
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 600;
   gap: 8px;
 }
@@ -310,5 +320,12 @@ const { explorer, hasExplorerSession } = useExplorer()
   .profile-icon {
     margin-top: 10px;
   }
+}
+</style><style scoped>
+.logout-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 8px 12px;
 }
 </style>

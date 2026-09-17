@@ -45,7 +45,7 @@ import LeaderboardView from '../components/LeaderboardView.vue'
 .eyebrow {
   margin: 0 0 8px;
   color: #2b825d;
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 900;
   letter-spacing: 0.09em;
 }
@@ -61,7 +61,7 @@ import LeaderboardView from '../components/LeaderboardView.vue'
   max-width: 680px;
   margin: 0;
   color: #69776f;
-  font-size: 14px;
+  font-size: 17px;
   line-height: 1.55;
 }
 

@@ -300,7 +300,7 @@ function saveZone() {
 .controls-introduction h2 {
   margin: 0 0 8px;
   color: #2d4037;
-  font-size: 21px;
+  font-size: 24px;
   font-weight: 700;
   line-height: 1.1;
 }
@@ -309,7 +309,7 @@ function saveZone() {
 .suitability-card p {
   margin: 0;
   color: #707c75;
-  font-size: 10px;
+  font-size: 13px;
   line-height: 1.5;
 }
 
@@ -332,7 +332,7 @@ function saveZone() {
   display: block;
   margin-bottom: 9px;
   color: #59665f;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -347,7 +347,7 @@ function saveZone() {
 
 .section-label span {
   color: #3a8a68;
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 600;
 }
 
@@ -356,7 +356,7 @@ function saveZone() {
   width: 100%;
   padding: 10px 11px;
   color: #536159;
-  font-size: 10px;
+  font-size: 13px;
   text-align: left;
   align-items: center;
   justify-content: space-between;
@@ -395,7 +395,7 @@ function saveZone() {
 
 .calendar-header strong {
   color: #405249;
-  font-size: 10px;
+  font-size: 13px;
   text-align: center;
 }
 
@@ -403,7 +403,7 @@ function saveZone() {
   grid-column: 1 / -1;
   margin: 6px 0 3px;
   color: #35906a;
-  font-size: 7px;
+  font-size: 10px;
   text-align: right;
 }
 
@@ -420,7 +420,7 @@ function saveZone() {
 
 .weekday-row span {
   color: #8b948f;
-  font-size: 7px;
+  font-size: 10px;
   text-align: center;
 }
 
@@ -429,7 +429,7 @@ function saveZone() {
   min-height: 25px;
   padding: 0;
   color: #58655e;
-  font-size: 8px;
+  font-size: 11px;
   place-items: center;
   background: transparent;
   border: 0;
@@ -462,7 +462,7 @@ function saveZone() {
 .apply-date-button {
   padding: 7px 12px;
   color: #ffffff;
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 700;
   background: #236b4c;
   border: 0;
@@ -479,7 +479,7 @@ function saveZone() {
 .filter-pill {
   padding: 6px 10px;
   color: #667169;
-  font-size: 8px;
+  font-size: 11px;
   background: #f0f2f0;
   border: 0;
   border-radius: 15px;
@@ -496,7 +496,7 @@ function saveZone() {
   width: 100%;
   padding: 8px 2px;
   color: #4e5d55;
-  font-size: 10px;
+  font-size: 13px;
   align-items: center;
   justify-content: space-between;
   background: transparent;
@@ -512,7 +512,7 @@ function saveZone() {
 
 .layer-icon {
   color: #2f815e;
-  font-size: 13px;
+  font-size: 16px;
 }
 
 .layer-checkbox {
@@ -520,7 +520,7 @@ function saveZone() {
   width: 14px;
   height: 14px;
   color: transparent;
-  font-size: 8px;
+  font-size: 11px;
   place-items: center;
   border: 1px solid #91a099;
   border-radius: 2px;
@@ -535,7 +535,7 @@ function saveZone() {
 .suitability-card h3 {
   margin: 0 0 9px;
   color: #3f5148;
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 700;
 }
 
@@ -548,7 +548,7 @@ function saveZone() {
   width: 100%;
   padding: 13px 16px;
   color: #ffffff;
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 700;
   align-items: center;
   justify-content: center;

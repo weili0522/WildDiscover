@@ -1,62 +1,52 @@
 [
   {
     "id": 1,
-    "source": "ABC News",
-    "publishedAt": "3 hours ago",
+    "source": "WWF Australia",
+    "publishedAt": "September 2024",
     "category": "Rediscoveries & Sightings",
-    "title": "Critically endangered Night Parrots detected in south-west Queensland",
-    "summary": "New field records have provided researchers with updated information about Night Parrot activity and habitat use.",
+    "title": "Breakthrough discovery: Indigenous rangers in outback WA find 50 night parrots",
+    "summary": "Indigenous rangers and researchers have discovered potentially the largest population of Night Parrots in the Ngururrpa Indigenous Protected Area, detecting the birds at 17 of 31 survey sites.",
     "image": "night-parrot",
-    "externalUrl": "https://www.abc.net.au/news/"
+    "externalUrl": "https://wwf.org.au/blogs/breakthrough-discovery-indigenous-rangers-in-outback-wa-find-50-night-parrots"
   },
   {
     "id": 2,
     "source": "CSIRO",
-    "publishedAt": "Yesterday",
+    "publishedAt": "February 2024",
     "category": "Ecosystem Science",
-    "title": "New research improves understanding of spinifex habitat conditions",
-    "summary": "Researchers are studying how vegetation and environmental conditions affect threatened bird habitats.",
+    "title": "Unlocking the genome of the endangered Night Parrot",
+    "summary": "Scientists have published the first fully annotated genome for the Night Parrot, providing a crucial tool to understand its biology and improve conservation efforts.",
     "image": "spinifex",
-    "externalUrl": "https://www.csiro.au/en/news/"
+    "externalUrl": "https://www.csiro.au/en/news/all/articles/2024/february/genome-endangered-night-parrot"
   },
   {
     "id": 3,
-    "source": "BirdLife Australia",
-    "publishedAt": "2 days ago",
-    "category": "Habitat Protection",
-    "title": "New conservation work focuses on protecting threatened grassland birds",
-    "summary": "Habitat protection projects are supporting vulnerable bird species across important Australian landscapes.",
-    "image": "plains-wanderer",
-    "externalUrl": "https://birdlife.org.au/news/"
+    "source": "ABC News",
+    "publishedAt": "August 2024",
+    "category": "Rediscoveries & Sightings",
+    "title": "Critically endangered night parrots detected in Queensland outback",
+    "summary": "Supported by government funding, conservation groups have successfully recorded Night Parrot calls, significantly expanding the known range of the critically endangered bird.",
+    "image": "night-parrot",
+    "externalUrl": "https://www.abc.net.au/news/2026-04-22/critically-endangered-night-parrots-detected-qld-outback/106587514"
   },
   {
     "id": 4,
-    "source": "Department of Climate Change & Water",
-    "publishedAt": "3 days ago",
-    "category": "Policy Updates",
-    "title": "Expanded sanctuary boundaries establish access to western arid woodlands",
-    "summary": "Stronger conservation policies aim to protect ecological corridors used by endangered desert fauna.",
-    "image": "princess-parrot",
-    "externalUrl": "https://www.dcceew.gov.au/about/news"
+    "source": "Bush Heritage Australia",
+    "publishedAt": "July 2024",
+    "category": "Habitat Protection",
+    "title": "Pullen Pullen protections strengthened",
+    "summary": "Ongoing management at the Pullen Pullen Reserve continues to safeguard Night Parrot populations through intensive feral cat and fox management.",
+    "image": "spinifex",
+    "externalUrl": "https://www.bushheritage.org.au/news/pullen-pullen-protections-strengthened?srsltid=AU7gw4UnjRXJgjmpbbGmOTneA-mpBk_jXz_fCcO1CoaDrULd8om5cfhO"
   },
   {
     "id": 5,
-    "source": "Australian Wildlife Conservancy",
-    "publishedAt": "4 days ago",
-    "category": "Rediscoveries & Sightings",
-    "title": "Acoustic sensor arrays capture promising vocal patterns in remote Pilbara ranges",
-    "summary": "Autonomous bioacoustic listening posts deployed across isolated ranges reveal potential calls of elusive ground-dwelling species.",
-    "image": "night-parrot",
-    "externalUrl": "https://www.australianwildlife.org/news/"
-  },
-  {
-    "id": 6,
-    "source": "Nature Conservation Council",
-    "publishedAt": "5 days ago",
-    "category": "Habitat Protection",
-    "title": "Indigenous Ranger networks expand active predator tracking in key refuge zones",
-    "summary": "Collaborative on-ground stewardship removes invasive threats and protects surrounding spinifex habitats.",
-    "image": "rufous-scrub-bird",
-    "externalUrl": "https://www.nature.org.au/"
+    "source": "IMOS",
+    "publishedAt": "October 2024",
+    "category": "Policy Updates",
+    "title": "Acoustic telemetry arrays in Queensland",
+    "summary": "Indigenous Desert Alliance and WWF have partnered to deploy massive acoustic sensor networks to identify new spinifex habitats for endangered species.",
+    "image": "sighting-queensland",
+    "externalUrl": "https://imos.org.au/facility/animal-tracking/acoustic-telemetry-arrays-queensland"
   }
 ]

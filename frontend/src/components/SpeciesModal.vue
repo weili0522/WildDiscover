@@ -4,8 +4,12 @@ defineProps({
     type: Boolean,
     default: false
   },
-  species: {
+species: {
     type: Object,
+    default: null
+  },
+  playingId: {
+    type: String,
     default: null
   }
 })
@@ -82,12 +86,12 @@ function handleBackdropClick(event) {
               </div>
 
               <div class="audio-controls">
-                <button
+                                <button
                   type="button"
                   class="play-button"
                   @click="emit('listen', species)"
                 >
-                  ▶
+                  {{ playingId === species.id ? '■' : '▶' }}
                 </button>
 
                 <div class="waveform" aria-hidden="true">
@@ -158,6 +162,11 @@ function handleBackdropClick(event) {
               <p>{{ species.didYouKnow }}</p>
             </div>
 
+            
+            <div class="source-attribution">
+              Source: Atlas of Living Australia (ALA) & EPBC Act Database
+            </div>
+
             <div class="modal-actions">
               <button
                 class="map-button"
@@ -213,7 +222,7 @@ function handleBackdropClick(event) {
   width: 32px;
   height: 32px;
   color: #65716b;
-  font-size: 25px;
+  font-size: 28px;
   line-height: 1;
   background: rgba(255, 255, 255, 0.94);
   border: 0;
@@ -245,7 +254,7 @@ function handleBackdropClick(event) {
   position: absolute;
   top: 12px;
   padding: 5px 8px;
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 700;
   border-radius: 12px;
 }
@@ -295,12 +304,12 @@ function handleBackdropClick(event) {
 
 .audio-heading strong {
   color: #287353;
-  font-size: 11px;
+  font-size: 14px;
 }
 
 .audio-heading span {
   color: #75817b;
-  font-size: 9px;
+  font-size: 12px;
 }
 
 .audio-controls {
@@ -338,7 +347,7 @@ function handleBackdropClick(event) {
 .audio-card p {
   margin: 10px 0 0;
   color: #6d7973;
-  font-size: 10px;
+  font-size: 13px;
   line-height: 1.5;
 }
 
@@ -349,19 +358,19 @@ function handleBackdropClick(event) {
 .species-title h2 {
   margin: 0 0 3px;
   color: #174b35;
-  font-size: 27px;
+  font-size: 30px;
 }
 
 .species-title em {
   color: #7b8680;
   font-family: Georgia, serif;
-  font-size: 12px;
+  font-size: 15px;
 }
 
 .summary {
   margin: 12px 0;
   color: #5f6d66;
-  font-size: 12px;
+  font-size: 15px;
   line-height: 1.55;
 }
 
@@ -384,14 +393,14 @@ function handleBackdropClick(event) {
 
 .information-card span {
   color: #79857f;
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
 }
 
 .information-card strong {
   color: #34483e;
-  font-size: 10px;
+  font-size: 13px;
   line-height: 1.35;
 }
 
@@ -428,7 +437,7 @@ function handleBackdropClick(event) {
 
 .why-card span {
   color: #718079;
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
 }
@@ -436,12 +445,12 @@ function handleBackdropClick(event) {
 .why-card p,
 .fact-card p {
   margin: 5px 0 0;
-  font-size: 10px;
+  font-size: 13px;
   line-height: 1.45;
 }
 
 .fact-card strong {
-  font-size: 10px;
+  font-size: 13px;
 }
 
 .modal-actions {
@@ -455,7 +464,7 @@ function handleBackdropClick(event) {
 .map-button,
 .secondary-close {
   padding: 9px 14px;
-  font-size: 10px;
+  font-size: 13px;
   font-weight: 700;
   border-radius: 6px;
   cursor: pointer;
@@ -494,4 +503,14 @@ function handleBackdropClick(event) {
     height: 220px;
   }
 }
+
+.source-attribution {
+  margin-top: 16px;
+  margin-bottom: 2px;
+  font-size: 13px;
+  color: #7b8a82;
+  font-style: italic;
+  text-align: right;
+}
+
 </style>

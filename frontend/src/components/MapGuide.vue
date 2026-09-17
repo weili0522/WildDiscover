@@ -78,7 +78,7 @@ const steps = [
   height: 42px;
   flex-shrink: 0;
   color: #237453;
-  font-size: 19px;
+  font-size: 22px;
   place-items: center;
   background: #dff4e9;
   border-radius: 10px;
@@ -87,14 +87,14 @@ const steps = [
 .guide-header h2 {
   margin: 0 0 4px;
   color: #236044;
-  font-size: 16px;
+  font-size: 19px;
   font-weight: 700;
 }
 
 .guide-header p {
   margin: 0;
   color: #718078;
-  font-size: 11px;
+  font-size: 14px;
 }
 
 .guide-steps {
@@ -128,7 +128,7 @@ const steps = [
   width: 28px;
   height: 28px;
   color: #68766e;
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 700;
   place-items: center;
   background: #edf0ee;
@@ -143,14 +143,14 @@ const steps = [
 .guide-steps h3 {
   margin: 2px 0 4px;
   color: #34463d;
-  font-size: 12px;
+  font-size: 15px;
   font-weight: 700;
 }
 
 .guide-steps p {
   margin: 0;
   color: #748078;
-  font-size: 10px;
+  font-size: 13px;
   line-height: 1.45;
 }
 </style>

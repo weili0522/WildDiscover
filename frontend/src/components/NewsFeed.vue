@@ -7,6 +7,18 @@ import princessParrotImage from '../assets/princess-parrot.jpg'
 import plainsWandererImage from '../assets/plains-wanderer.jpg'
 import rufousScrubBirdImage from '../assets/rufous-scrub-bird.jpg'
 import heroImage from '../assets/hero.jpg'
+import sightingQueenslandImage from '../assets/sighting-queensland.jpg'
+import sightingPilbaraImage from '../assets/sighting-pilbara.jpg'
+
+const imageMap = {
+  'night-parrot': nightParrotImage,
+  'princess-parrot': princessParrotImage,
+  'plains-wanderer': plainsWandererImage,
+  'rufous-scrub-bird': rufousScrubBirdImage,
+  'spinifex': heroImage,
+  'sighting-queensland': sightingQueenslandImage,
+  'sighting-pilbara': sightingPilbaraImage
+}
 
 const categories = [
   'All News',
@@ -17,14 +29,6 @@ const categories = [
 ]
 
 const selectedCategory = ref('All News')
-
-const imageMap = {
-  'night-parrot': nightParrotImage,
-  'princess-parrot': princessParrotImage,
-  'plains-wanderer': plainsWandererImage,
-  'rufous-scrub-bird': rufousScrubBirdImage,
-  spinifex: heroImage
-}
 
 const filteredNews = computed(() => {
   if (selectedCategory.value === 'All News') {
@@ -56,10 +60,7 @@ function getArticleImage(imageName) {
       </button>
     </div>
 
-    <div class="update-status">
-      <span class="status-dot"></span>
-      Curated daily
-    </div>
+    
 
     <div v-if="filteredNews.length" class="news-grid">
       <article
@@ -124,7 +125,7 @@ function getArticleImage(imageName) {
   border-radius: 20px;
   background: transparent;
   color: #5e6c65;
-  font-size: 12px;
+  font-size: 15px;
   font-weight: 700;
   cursor: pointer;
   transition:
@@ -148,7 +149,7 @@ function getArticleImage(imageName) {
   gap: 7px;
   margin: 10px 4px 16px;
   color: #6e7e75;
-  font-size: 11px;
+  font-size: 14px;
 }
 
 .status-dot {
@@ -192,7 +193,7 @@ function getArticleImage(imageName) {
   gap: 7px;
   margin-bottom: 10px;
   color: #7a8881;
-  font-size: 11px;
+  font-size: 14px;
 }
 
 .source {
@@ -211,20 +212,20 @@ function getArticleImage(imageName) {
 .news-content h2 {
   margin: 0 0 8px;
   color: #203f31;
-  font-size: 17px;
+  font-size: 20px;
   line-height: 1.35;
 }
 
 .news-content p {
   margin: 0 0 12px;
   color: #68766f;
-  font-size: 13px;
+  font-size: 16px;
   line-height: 1.55;
 }
 
 .read-link {
   color: #1d704e;
-  font-size: 12px;
+  font-size: 15px;
   font-weight: 800;
   text-decoration: none;
 }

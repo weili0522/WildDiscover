@@ -191,7 +191,7 @@
 .hero-content p {
   max-width: 620px;
   margin: 0 auto 26px;
-  font-size: 17px;
+  font-size: 20px;
   line-height: 1.45;
 }
 
@@ -227,7 +227,7 @@
 .section-heading h2 {
   margin-bottom: 8px;
   color: #174d38;
-  font-size: 34px;
+  font-size: 37px;
   font-weight: 700;
 }
 
@@ -258,7 +258,7 @@
   width: 44px;
   height: 44px;
   margin-bottom: 20px;
-  font-size: 20px;
+  font-size: 23px;
   place-items: center;
   border-radius: 50%;
 }
@@ -286,7 +286,7 @@
 .feature-card h3 {
   margin-bottom: 11px;
   color: #174d38;
-  font-size: 20px;
+  font-size: 23px;
   font-weight: 700;
 }
 
@@ -294,7 +294,7 @@
   min-height: 88px;
   margin-bottom: 16px;
   color: #5e6963;
-  font-size: 13px;
+  font-size: 16px;
   line-height: 1.55;
 }
 
@@ -326,7 +326,7 @@
   right: 10px;
   padding: 4px 7px;
   color: #277854;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 700;
   background: #ffffff;
   border-radius: 8px;
@@ -340,12 +340,12 @@
 .map-preview-text small {
   margin-bottom: 4px;
   color: #50685c;
-  font-size: 8px;
+  font-size: 11px;
   letter-spacing: 0.08em;
 }
 
 .map-preview-text strong {
-  font-size: 12px;
+  font-size: 15px;
 }
 
 .bird-preview {
@@ -361,7 +361,7 @@
   left: 10px;
   padding: 4px 6px;
   color: #ffffff;
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 700;
   background: #d94848;
   border-radius: 3px;
@@ -374,7 +374,7 @@
   left: 10px;
   display: flex;
   color: #ffffff;
-  font-size: 10px;
+  font-size: 13px;
   align-items: center;
   justify-content: space-between;
 }
@@ -398,19 +398,19 @@
 }
 
 .journal-heading strong {
-  font-size: 11px;
+  font-size: 14px;
 }
 
 .journal-heading small {
   margin-top: 4px;
   color: #69746e;
-  font-size: 9px;
+  font-size: 12px;
 }
 
 .journal-heading > span {
   padding: 4px 6px;
   color: #27865b;
-  font-size: 8px;
+  font-size: 11px;
   background: #dff3e8;
   border-radius: 4px;
 }
@@ -418,7 +418,7 @@
 .guest-warning {
   padding: 10px;
   color: #795638;
-  font-size: 9px;
+  font-size: 12px;
   line-height: 1.4;
   background: #fff0e4;
   border: 1px solid #efc9a8;
@@ -429,14 +429,14 @@
   display: block;
   margin-bottom: 12px;
   color: #36a06f;
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 700;
 }
 
 .news-preview > strong {
   display: block;
   min-height: 45px;
-  font-size: 10px;
+  font-size: 13px;
   line-height: 1.45;
 }
 
@@ -444,7 +444,7 @@
   display: flex;
   margin-top: 10px;
   padding-top: 10px;
-  font-size: 8px;
+  font-size: 11px;
   justify-content: space-between;
   border-top: 1px solid #dfe4e0;
 }
@@ -454,7 +454,7 @@
   margin-top: auto;
   padding: 11px 13px;
   color: #24543f;
-  font-size: 12px;
+  font-size: 15px;
   font-weight: 700;
   text-decoration: none;
   align-items: center;
@@ -480,7 +480,7 @@
   }
 
   .hero-content h1 {
-    font-size: 38px;
+    font-size: 41px;
   }
 
   .feature-grid {

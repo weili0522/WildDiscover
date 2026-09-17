@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue'
+
 import { useRoute } from 'vue-router'
 
 import Navbar from './components/Navbar.vue'
@@ -7,7 +7,7 @@ import Footer from './components/Footer.vue'
 
 const route = useRoute()
 
-const showFooter = computed(() => route.name !== 'map')
+
 </script>
 
 <template>
@@ -18,7 +18,7 @@ const showFooter = computed(() => route.name !== 'map')
       <RouterView />
     </main>
 
-    <Footer v-if="showFooter" />
+    <Footer />
   </div>
 </template>
 

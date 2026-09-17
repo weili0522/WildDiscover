@@ -249,7 +249,7 @@ const router = useRouter()
 .back-link {
   padding: 0;
   color: #47705e;
-  font-size: 10px;
+  font-size: 13px;
   background: transparent;
   border: 0;
 }
@@ -265,7 +265,7 @@ const router = useRouter()
 .heading-row p {
   margin: 0 0 4px;
   color: #748078;
-  font-size: 9px;
+  font-size: 12px;
 }
 
 .title-row {
@@ -277,14 +277,14 @@ const router = useRouter()
 .title-row h1 {
   margin: 0;
   color: #174a34;
-  font-size: 27px;
+  font-size: 30px;
   font-weight: 700;
 }
 
 .completed-label {
   padding: 5px 9px;
   color: #277452;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 700;
   background: #d9f4e5;
   border-radius: 12px;
@@ -300,7 +300,7 @@ const router = useRouter()
 .completion-badges span {
   padding: 7px 9px;
   color: #647169;
-  font-size: 8px;
+  font-size: 11px;
   background: #ffffff;
   border: 1px solid #e0e6e2;
   border-radius: 6px;
@@ -348,19 +348,19 @@ const router = useRouter()
 
 .recorded-boundary strong {
   color: #405249;
-  font-size: 10px;
+  font-size: 13px;
 }
 
 .recorded-boundary small {
   margin-top: 3px;
   color: #79847e;
-  font-size: 8px;
+  font-size: 11px;
 }
 
 .recorded-boundary > span {
   padding: 5px 7px;
   color: #3265e8;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 700;
   white-space: nowrap;
   background: #e6edff;
@@ -372,7 +372,7 @@ const router = useRouter()
   right: 15px;
   padding: 8px 11px;
   color: #536159;
-  font-size: 9px;
+  font-size: 12px;
   border-radius: 6px;
 }
 
@@ -387,14 +387,14 @@ const router = useRouter()
 .environment-record p {
   margin: 0 0 8px;
   color: #627068;
-  font-size: 9px;
+  font-size: 12px;
 }
 
 .environment-record span {
   display: inline-block;
   padding: 5px 8px;
   color: #277351;
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 700;
   background: #e5f7ed;
   border-radius: 5px;
@@ -427,20 +427,20 @@ const router = useRouter()
 .notes-card h2 {
   margin: 0;
   color: #405148;
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 700;
 }
 
 .card-title p {
   margin: 3px 0 0;
   color: #7b8580;
-  font-size: 8px;
+  font-size: 11px;
 }
 
 .card-title > span {
   padding: 4px 7px;
   color: #277452;
-  font-size: 8px;
+  font-size: 11px;
   background: #dff4e8;
   border-radius: 10px;
 }
@@ -470,19 +470,19 @@ const router = useRouter()
 }
 
 .species-summary strong {
-  font-size: 11px;
+  font-size: 14px;
 }
 
 .species-summary em,
 .species-summary small {
   margin-top: 2px;
   color: #77827c;
-  font-size: 8px;
+  font-size: 11px;
 }
 
 .species-summary > span {
   color: #3265e8;
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 700;
 }
 
@@ -507,11 +507,11 @@ const router = useRouter()
 .summary-metrics span {
   margin-bottom: 4px;
   color: #78837d;
-  font-size: 7px;
+  font-size: 10px;
 }
 
 .summary-metrics strong {
-  font-size: 9px;
+  font-size: 12px;
 }
 
 .finding {
@@ -550,25 +550,25 @@ const router = useRouter()
 }
 
 .finding strong {
-  font-size: 9px;
+  font-size: 12px;
 }
 
 .finding p {
   margin: 2px 0;
   color: #69756f;
-  font-size: 8px;
+  font-size: 11px;
 }
 
 .finding span,
 .finding time {
   color: #63736b;
-  font-size: 8px;
+  font-size: 11px;
 }
 
 .notes-card p {
   margin: 9px 0 0;
   color: #5f6c65;
-  font-size: 9px;
+  font-size: 12px;
   font-style: italic;
   line-height: 1.55;
 }
@@ -599,17 +599,17 @@ const router = useRouter()
 }
 
 .contribution-card strong {
-  font-size: 10px;
+  font-size: 13px;
 }
 
 .contribution-card span {
   margin-top: 2px;
-  font-size: 8px;
+  font-size: 11px;
 }
 
 .contribution-card b {
   padding: 6px 8px;
-  font-size: 8px;
+  font-size: 11px;
   background: #c8f1da;
   border-radius: 12px;
 }
@@ -618,7 +618,7 @@ const router = useRouter()
 .gallery-button {
   width: 100%;
   padding: 11px;
-  font-size: 10px;
+  font-size: 13px;
   font-weight: 700;
   border-radius: 7px;
 }

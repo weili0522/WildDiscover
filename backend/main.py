@@ -1,3 +1,4 @@
+from pydantic import BaseModel
 import json
 import os
 from functools import lru_cache
@@ -9,9 +10,12 @@ from fastapi.middleware.gzip import GZipMiddleware
 
 allowed_origins = [
     "http://localhost:5173",
-    "https://wild-discover.vercel.app",
-    "https://wild-discover-46mf.vercel.app"
+    "http://127.0.0.1:5173",
 ]
+
+frontend_url = os.environ.get("FRONTEND_URL")
+if frontend_url:
+    allowed_origins.append(frontend_url)
 
 HABITAT_GEOJSON_PATH = (
     Path(__file__).resolve().parent
@@ -29,6 +33,11 @@ def load_habitat_geojson():
     ) as geojson_file:
         return json.load(geojson_file)
 
+from database import engine, Base
+import models
+
+Base.metadata.create_all(bind=engine)
+
 app = FastAPI(
     title="WildDiscover API",
     version="1.0.0"
@@ -36,7 +45,7 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=allowed_origins,
+    allow_origins=allowed_origins, # Updated for Vercel deployment
     allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -76,36 +85,13 @@ async def predict_habitat(
     latitude: float = Query(None, ge=-90, le=90),
     longitude: float = Query(None, ge=-180, le=180)
 ):
-    """Return predicted habitat suitability for a selected species.
+    valid_species = [
+        "night-parrot", "princess-parrot", "plains-wanderer", 
+        "rufous-scrub-bird", "malleefowl", "dusky-grasswren",
+        "pilot-bird" # Keep pilot-bird for fallback
+    ]
 
-    The endpoint currently supports the pilot species identified by
-    ``pilot-bird``. Optional coordinates are first constrained to valid
-    global latitude and longitude ranges by FastAPI. When supplied, they
-    are also checked against the supported Australian bounds: latitude
-    from -44 to -10 degrees and longitude from 112 to 154 degrees.
-
-    Args:
-        species_id: Identifier of the species for which habitat suitability
-            is requested.
-        latitude: Optional latitude in decimal degrees. The global valid
-            range is -90 to 90, while the supported Australian range is
-            -44 to -10.
-        longitude: Optional longitude in decimal degrees. The global valid
-            range is -180 to 180, while the supported Australian range is
-            112 to 154.
-
-    Returns:
-        GeoJSONFeatureCollection: A GeoJSON FeatureCollection containing a
-        habitat polygon and properties including the species identifier,
-        species name, and suitability score.
-
-    Raises:
-        HTTPException: A 404 error if the species identifier is unsupported.
-        HTTPException: A 400 error if the supplied coordinates fall outside
-            the supported Australian bounds.
-    """
-
-    if species_id != "pilot-bird":
+    if species_id not in valid_species:
         raise HTTPException(
             status_code=404,
             detail="Species not found"
@@ -123,8 +109,14 @@ async def predict_habitat(
             detail="Longitude is outside the supported Australian bounds"
         )
 
-    
-    prediction = load_habitat_geojson()
+    geojson_path = Path(__file__).resolve().parent / "data" / "processed" / f"{species_id}.geojson"
+    if not geojson_path.exists():
+        # Fallback to pilot-bird or ghost habitat if specific one isn't ready
+        geojson_path = Path(__file__).resolve().parent / "data" / "processed" / "ghost_habitat_prediction.geojson"
+
+    with geojson_path.open("r", encoding="utf-8") as f:
+        prediction = json.load(f)
+
     return apply_location_blurring(prediction)
 
 @app.get(
@@ -139,3 +131,185 @@ async def get_habitat_layer():
         from the live model suitability raster.
     """
     return load_habitat_geojson()
+
+# --- Phase 1 Placeholder API Endpoints ---
+
+from fastapi import Depends
+from sqlalchemy.orm import Session
+from database import get_db
+from models import User
+import hashlib
+
+def hash_password(password: str) -> str:
+    return hashlib.sha256(password.encode()).hexdigest()
+
+class AuthRequest(BaseModel):
+    username: str
+    password: str
+
+@app.post("/api/v1/auth/register")
+async def register(request: AuthRequest, db: Session = Depends(get_db)):
+    existing_user = db.query(User).filter(User.username == request.username).first()
+    if existing_user:
+        raise HTTPException(status_code=400, detail="Username already registered")
+        
+    hashed_pwd = hash_password(request.password)
+    new_user = User(username=request.username, password_hash=hashed_pwd)
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+    
+    return {"message": "Registration successful", "username": new_user.username}
+
+@app.post("/api/v1/auth/login")
+async def login(request: AuthRequest, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.username == request.username).first()
+    if not user:
+        raise HTTPException(status_code=401, detail="Invalid username or password")
+        
+    if user.password_hash != hash_password(request.password):
+        raise HTTPException(status_code=401, detail="Invalid username or password")
+        
+    # In a real app we would generate a proper JWT token here
+    return {"access_token": f"token_for_{user.username}", "token_type": "bearer", "username": user.username}
+
+
+
+@app.get("/api/v1/map/geojson")
+async def get_map_geojson():
+    points_path = Path(__file__).resolve().parent / "data" / "raw" / "viewing_points_aus.geojson"
+    if points_path.exists():
+        with points_path.open("r", encoding="utf-8") as f:
+            return json.load(f)
+    return {
+        "type": "FeatureCollection",
+        "features": []
+    }
+
+
+class JournalRequest(BaseModel):
+    username: str
+    species_id: str
+    exploration_date: str
+
+@app.post("/api/v1/journal")
+async def save_journal(request: JournalRequest, db: Session = Depends(get_db)):
+    from models import Investigation
+    user = db.query(User).filter(User.username == request.username).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+        
+    investigation = Investigation(
+        user_id=user.id,
+        species_id=request.species_id,
+        exploration_date=request.exploration_date
+    )
+    db.add(investigation)
+    user.logged_trips_count = (user.logged_trips_count or 0) + 1
+    db.commit()
+    db.refresh(investigation)
+    
+    return {"message": "Journal saved", "id": investigation.id}
+
+@app.get("/api/v1/journal/{username}")
+async def get_journal(username: str, db: Session = Depends(get_db)):
+    from models import Investigation
+    user = db.query(User).filter(User.username == username).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+        
+    investigations = db.query(Investigation).filter(Investigation.user_id == user.id).order_by(Investigation.id.desc()).all()
+    
+    return [
+        {
+            "id": inv.id,
+            "species_id": inv.species_id,
+            "exploration_date": inv.exploration_date,
+            "created_at": inv.created_at.isoformat()
+        }
+        for inv in investigations
+    ]
+
+
+class ChallengeSuccessRequest(BaseModel):
+    username: str
+
+@app.post("/api/v1/challenge/success")
+async def challenge_success(request: ChallengeSuccessRequest, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.username == request.username).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+        
+    user.bird_calls_identified = (user.bird_calls_identified or 0) + 1
+    db.commit()
+    
+    return {"message": "Success recorded", "bird_calls_identified": user.bird_calls_identified or 0}
+
+@app.get("/api/v1/profile/{username}")
+async def get_profile(username: str, db: Session = Depends(get_db)):
+    from models import Investigation
+    user = db.query(User).filter(User.username == username).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+        
+    # Calculate rank based on points: (logged_trips_count * 20) + (bird_calls_identified * 5)
+    all_users = db.query(User).all()
+    
+    # Create a list of tuples (user_id, points)
+    user_points = []
+    for u in all_users:
+        pts = ((u.logged_trips_count or 0) * 20) + ((u.bird_calls_identified or 0) * 5)
+        user_points.append((u.id, pts))
+        
+    # Sort descending
+    user_points.sort(key=lambda x: x[1], reverse=True)
+    
+    # Find rank
+    rank = 1
+    for i, up in enumerate(user_points):
+        if up[0] == user.id:
+            rank = i + 1
+            break
+            
+    # Fetch investigations
+    investigations = db.query(Investigation).filter(Investigation.user_id == user.id).order_by(Investigation.id.desc()).all()
+    inv_list = [
+        {
+            "id": inv.id,
+            "species_id": inv.species_id,
+            "exploration_date": inv.exploration_date,
+            "created_at": inv.created_at.isoformat()
+        }
+        for inv in investigations
+    ]
+            
+    my_points = ((user.logged_trips_count or 0) * 20) + ((user.bird_calls_identified or 0) * 5)
+    
+    return {
+        "username": user.username,
+        "points": my_points,
+        "logged_trips_count": user.logged_trips_count or 0,
+        "bird_calls_identified": user.bird_calls_identified or 0,
+        "rank": rank,
+        "total_users": len(all_users),
+        "investigations": inv_list
+    }
+
+
+@app.get("/api/v1/leaderboard")
+async def get_leaderboard(db: Session = Depends(get_db)):
+    all_users = db.query(User).all()
+    
+    leaderboard = []
+    for u in all_users:
+        pts = ((u.logged_trips_count or 0) * 20) + ((u.bird_calls_identified or 0) * 5)
+        leaderboard.append({
+            "id": u.id,
+            "username": u.username,
+            "points": pts
+        })
+        
+    leaderboard.sort(key=lambda x: x["points"], reverse=True)
+    
+    # Return top 5
+    return leaderboard[:5]

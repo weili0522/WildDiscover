@@ -1,14 +1,22 @@
 <script setup>
-import { onBeforeUnmount, onMounted } from 'vue'
+import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 
-import { habitatPotentialPoints } from '../mocks/mapOptions'
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'
 
 const props = defineProps({
-  mode: {
+  speciesId: {
     type: String,
-    default: 'explore'
+    default: null
+  },
+  showViewingPoints: {
+    type: Boolean,
+    default: false
+  },
+  probabilityThreshold: {
+    type: Number,
+    default: 0
   }
 })
 
@@ -16,23 +24,15 @@ const emit = defineEmits(['select-potential'])
 
 let map = null
 let watchZone = null
+let habitatLayer = null
+let viewingPointsLayer = null
+let currentGeoJSON = null
+
 
 const levelStyles = {
-  high: {
-    color: '#3265e8',
-    fillColor: '#3265e8',
-    radius: 65000
-  },
-  medium: {
-    color: '#df8b24',
-    fillColor: '#df8b24',
-    radius: 85000
-  },
-  low: {
-    color: '#8c9791',
-    fillColor: '#8c9791',
-    radius: 55000
-  }
+  high: { color: '#3265e8', fillColor: '#3265e8', threshold: 0.8 },
+  medium: { color: '#df8b24', fillColor: '#df8b24', threshold: 0.6 },
+  low: { color: '#8c9791', fillColor: '#8c9791', threshold: 0 }
 }
 
 const watchZoneCoordinates = [
@@ -42,185 +42,169 @@ const watchZoneCoordinates = [
   [-22.58, 118.65]
 ]
 
-function createMarkerIcon(point) {
-  return L.divIcon({
-    className: 'potential-marker-wrapper',
-    html: `
-      <button
-        class="potential-marker marker-${point.id}"
-        type="button"
-        aria-label="${point.level} ${point.probability}%"
-      >
-        <span class="marker-shape"></span>
-
-        <span class="marker-content">
-          <strong>${point.level}</strong>
-          <small>${point.location}</small>
-        </span>
-
-        <b>${point.probability}%</b>
-      </button>
-    `,
-    iconSize: [190, 52],
-    iconAnchor: [95, 26]
-  })
+function getLevelBySuitability(suit) {
+  if (suit >= 0.8) return 'high'
+  if (suit >= 0.6) return 'medium'
+  return 'low'
 }
 
-function addPotentialArea(point) {
-  const style = levelStyles[point.id]
-
-  L.circle(
-    [point.latitude, point.longitude],
-    {
-      radius:
-        props.mode === 'plan'
-          ? style.radius * 1.25
-          : style.radius,
-      color: style.color,
-      fillColor: style.fillColor,
-      fillOpacity: props.mode === 'plan' ? 0.48 : 0.3,
-      opacity: props.mode === 'plan' ? 0.2 : 0.7,
-      weight: props.mode === 'plan' ? 1 : 2,
-      className: `potential-circle potential-${point.id}`
+function renderHabitatLayer() {
+    if (!map || !currentGeoJSON) return
+    
+    if (habitatLayer) {
+      map.removeLayer(habitatLayer)
     }
-  ).addTo(map)
-
-  const marker = L.marker(
-    [point.latitude, point.longitude],
-    {
-      icon: createMarkerIcon(point)
-    }
-  ).addTo(map)
-
-  marker.on('click', () => {
-    emit('select-potential', point)
-  })
-}
-
-function addPlanningDecorations() {
-  const decorativeAreas = [
-    {
-      coordinates: [-22.34, 118.5],
-      radius: 110000,
-      color: '#dd8a19',
-      opacity: 0.27
-    },
-    {
-      coordinates: [-22.39, 118.81],
-      radius: 76000,
-      color: '#286be8',
-      opacity: 0.48
-    },
-    {
-      coordinates: [-22.22, 119.04],
-      radius: 98000,
-      color: '#dc8a1d',
-      opacity: 0.28
-    },
-    {
-      coordinates: [-22.47, 118.8],
-      radius: 175000,
-      color: '#899590',
-      opacity: 0.17
-    }
-  ]
-
-  decorativeAreas.forEach((area) => {
-    L.circle(area.coordinates, {
-      radius: area.radius,
-      color: 'transparent',
-      fillColor: area.color,
-      fillOpacity: area.opacity,
-      weight: 0,
-      className: 'heat-area'
+    
+    habitatLayer = L.geoJSON(currentGeoJSON, {
+      filter: (feature) => {
+        const suit = feature.properties.suitability || 0;
+        return (suit * 100) >= props.probabilityThreshold;
+      },
+      style: (feature) => {
+        const suit = feature.properties.suitability || 0
+        const level = getLevelBySuitability(suit)
+        const style = levelStyles[level]
+        return {
+          color: style.color,
+          fillColor: style.fillColor,
+          fillOpacity: 0.6,
+          opacity: 0.8,
+          weight: 1.5,
+          className: `habitat-polygon potential-${level}` // removed potential-circle to prevent blur
+        }
+      },
+      onEachFeature: (feature, layer) => {
+        const suit = feature.properties.suitability || 0
+        const level = getLevelBySuitability(suit)
+        const probability = Math.round(suit * 100)
+        
+        // Add hover tooltip
+        layer.bindTooltip(`<strong>${level.toUpperCase()} POTENTIAL</strong><br/>Probability: ${probability}%`, {
+          sticky: true,
+          className: 'habitat-tooltip'
+        })
+        
+        layer.on('click', () => {
+          emit('select-potential', {
+             id: level,
+             probability: probability,
+             level: `${level.charAt(0).toUpperCase() + level.slice(1)} Potential`,
+             location: 'Selected Region'
+          })
+        })
+      }
     }).addTo(map)
-  })
-
-  watchZone = L.polygon(
-    watchZoneCoordinates,
-    {
-      color: '#42bd89',
-      fillColor: '#42bd89',
-      fillOpacity: 0.09,
-      weight: 2,
-      dashArray: '7 6'
-    }
-  ).addTo(map)
-
-  watchZoneCoordinates.forEach((coordinate) => {
-    L.circleMarker(coordinate, {
-      radius: 4,
-      color: '#ffffff',
-      fillColor: '#42bd89',
-      fillOpacity: 1,
-      weight: 2
-    }).addTo(map)
-  })
-
-  watchZone.bindTooltip(
-    `
-      <div class="watch-zone-popup">
-        <div class="watch-zone-heading">
-          <strong>◉ Watch Zone Created</strong>
-          <small>Pilbara Sector 4</small>
-        </div>
-
-        <span>
-          <b>Night Parrot</b> • Area: 14.2 km²
-        </span>
-
-        <span>
-          Avg Suitability:
-          <mark>82%</mark>
-        </span>
-
-        <div class="watch-zone-actions">
-          <button type="button">✎ Edit Zone</button>
-          <button type="button">Clear Zone</button>
-        </div>
-      </div>
-    `,
-    {
-      permanent: true,
-      direction: 'top',
-      offset: [0, -6],
-      className: 'watch-zone-tooltip'
-    }
-  )
-
-  map.fitBounds(watchZone.getBounds(), {
-    padding: [110, 110]
-  })
 }
 
-function initialiseMap() {
-  const isPlanningMode = ['plan', 'detail', 'summary'].includes(
-    props.mode
-  )
-
-  map = L.map('habitat-map', {
-    zoomControl: false,
-    attributionControl: false
-  }).setView([-22.4, 118.75], 7)
-
-  const tileUrl = isPlanningMode
-    ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-    : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
-
-  L.tileLayer(tileUrl, {
-    maxZoom: 19
-  }).addTo(map)
-
-  L.control.zoom({
-    position: 'bottomright'
-  }).addTo(map)
-
-  habitatPotentialPoints.forEach(addPotentialArea)
-
-  if (isPlanningMode) {
-    addPlanningDecorations()
+async function fetchAndRenderHabitat() {
+  if (!props.speciesId || !map) return
+  
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/v1/predict/${props.speciesId}`)
+    if (!res.ok) throw new Error('Failed to fetch habitat data')
+    currentGeoJSON = await res.json()
+    
+    renderHabitatLayer()
+    
+    if (habitatLayer && habitatLayer.getBounds && habitatLayer.getBounds().isValid && habitatLayer.getBounds().isValid()) {
+      map.fitBounds(habitatLayer.getBounds(), { padding: [50, 50] })
+    }
+  } catch (e) {
+    console.error(e)
   }
 }
+
+async function fetchAndRenderViewingPoints() {
+  if (!map) return
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/v1/map/geojson`)
+    if (!res.ok) throw new Error('Failed to fetch viewing points')
+    const geojsonData = await res.json()
+    
+    if (viewingPointsLayer) {
+      map.removeLayer(viewingPointsLayer)
+    }
+    
+    viewingPointsLayer = L.geoJSON(geojsonData, {
+      pane: 'viewingPointsPane',
+      filter: (feature) => {
+        return feature.properties && feature.properties.name
+      },
+      pointToLayer: (feature, latlng) => {
+        return L.circleMarker(latlng, {
+          pane: 'viewingPointsPane',
+          radius: 6,
+          fillColor: "#ff7800",
+          color: "#fff",
+          weight: 2,
+          opacity: 1,
+          fillOpacity: 0.8
+        })
+      },
+      onEachFeature: (feature, layer) => {
+        const p = feature.properties
+        const name = p.name || 'Unnamed Viewpoint'
+        
+        let details = []
+        if (p.tourism && p.tourism !== 'viewpoint') {
+          details.push(p.tourism.charAt(0).toUpperCase() + p.tourism.slice(1))
+        }
+        if (p.surface) {
+          details.push(`Surface: ${p.surface}`)
+        }
+        
+        let content = `<strong>${name}</strong>`
+        if (details.length > 0) {
+          content += `<br/><span style="color: #666; font-size: 1.17em;">${details.join(' • ')}</span>`
+        }
+        
+        layer.bindTooltip(content, { 
+          direction: 'top',
+          className: 'viewing-point-tooltip',
+          offset: [0, -6]
+        })
+      }
+    })
+    
+    if (props.showViewingPoints) {
+      viewingPointsLayer.addTo(map)
+    }
+  } catch (e) {
+    console.error(e)
+  }
+}
+
+
+function initialiseMap() {
+  map = L.map('habitat-map', { zoomControl: false, attributionControl: false }).setView([-25.4, 133.75], 4)
+  
+  // Create a custom pane for viewing points so they always sit above polygons
+  map.createPane('viewingPointsPane')
+  map.getPane('viewingPointsPane').style.zIndex = 650
+  
+  const tileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+  L.tileLayer(tileUrl, { maxZoom: 19 }).addTo(map)
+  L.control.zoom({ position: 'bottomright' }).addTo(map)
+  fetchAndRenderHabitat()
+  fetchAndRenderViewingPoints()
+}
+
+watch(() => props.showViewingPoints, (newVal) => {
+  if (!viewingPointsLayer || !map) return
+  if (newVal) {
+    viewingPointsLayer.addTo(map)
+  } else {
+    map.removeLayer(viewingPointsLayer)
+  }
+})
+
+watch(() => props.speciesId, () => {
+  fetchAndRenderHabitat()
+})
+
+watch(() => props.probabilityThreshold, () => {
+  renderHabitatLayer()
+})
 
 onMounted(() => {
   initialiseMap()
@@ -231,41 +215,15 @@ onBeforeUnmount(() => {
     map.remove()
     map = null
     watchZone = null
+    habitatLayer = null
+    viewingPointsLayer = null
   }
 })
 </script>
 
 <template>
-  <section
-    class="map-shell"
-    :class="{ 'planning-map': props.mode === 'plan' }"
-  >
-    <div
-      v-if="props.mode === 'plan'"
-      class="watch-zone-toolbar"
-    >
-      <div class="toolbar-buttons">
-        <button type="button" class="active">
-          ⌖ Draw Watch Zone
-        </button>
-
-        <button type="button" aria-label="Information">
-          ⓘ
-        </button>
-
-        <button type="button">
-          ✎ Edit Zone
-        </button>
-
-        <button type="button">
-          ▣ Clear
-        </button>
-      </div>
-
-      <span class="toolbar-hint">
-        ● Click and drag handles to resize, or click map to trace points.
-      </span>
-    </div>
+  <section class="map-shell">
+    
 
     <div
       v-if="props.mode === 'explore'"
@@ -368,10 +326,11 @@ onBeforeUnmount(() => {
 
 .planning-map :deep(.leaflet-tile-pane) {
   filter:
-    saturate(0.45)
-    brightness(0.68)
-    sepia(0.1)
-    hue-rotate(85deg);
+    invert(90%)
+    hue-rotate(180deg)
+    brightness(85%)
+    contrast(85%)
+    sepia(15%);
 }
 
 :deep(.leaflet-control-zoom) {
@@ -396,7 +355,7 @@ onBeforeUnmount(() => {
   max-width: calc(100% - 86px);
   padding: 7px 10px;
   color: #42524a;
-  font-size: 9px;
+  font-size: 12px;
   align-items: center;
   gap: 8px;
   background: rgba(255, 255, 255, 0.94);
@@ -442,7 +401,7 @@ onBeforeUnmount(() => {
 .toolbar-buttons button {
   padding: 7px 10px;
   color: #536159;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 600;
   background: transparent;
   border: 0;
@@ -458,7 +417,7 @@ onBeforeUnmount(() => {
 .toolbar-hint {
   padding: 6px 9px;
   color: #45564d;
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 600;
   background: rgba(255, 255, 255, 0.96);
   border-radius: 5px;
@@ -484,17 +443,17 @@ onBeforeUnmount(() => {
 
 .legend-heading strong {
   color: #405047;
-  font-size: 9px;
+  font-size: 12px;
 }
 
 .legend-heading span {
   color: #6e7a73;
-  font-size: 7px;
+  font-size: 10px;
 }
 
 .mini-levels {
   display: flex;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 600;
   gap: 14px;
 }
@@ -515,7 +474,7 @@ onBeforeUnmount(() => {
   display: block;
   margin-top: 9px;
   color: #718078;
-  font-size: 7px;
+  font-size: 10px;
 }
 
 .map-environment {
@@ -525,7 +484,7 @@ onBeforeUnmount(() => {
   bottom: 16px;
   padding: 7px 9px;
   color: #637068;
-  font-size: 8px;
+  font-size: 11px;
   background: rgba(255, 255, 255, 0.92);
   border-radius: 5px;
 }
@@ -537,7 +496,7 @@ onBeforeUnmount(() => {
   bottom: 16px;
   padding: 6px 9px;
   color: #56635c;
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 700;
   background: rgba(255, 255, 255, 0.94);
   border-radius: 4px;
@@ -574,19 +533,19 @@ onBeforeUnmount(() => {
 }
 
 :deep(.potential-marker strong) {
-  font-size: 11px;
+  font-size: 14px;
 }
 
 :deep(.potential-marker small) {
   margin-top: 2px;
   color: #68736d;
-  font-size: 8px;
+  font-size: 11px;
 }
 
 :deep(.potential-marker b) {
   padding: 3px 5px;
   color: #ffffff;
-  font-size: 9px;
+  font-size: 12px;
   border-radius: 4px;
 }
 
@@ -655,7 +614,7 @@ onBeforeUnmount(() => {
   flex-direction: column;
   gap: 5px;
   color: #48564f;
-  font-size: 9px;
+  font-size: 12px;
 }
 
 :deep(.watch-zone-heading) {
@@ -667,12 +626,12 @@ onBeforeUnmount(() => {
 
 :deep(.watch-zone-heading strong) {
   color: #2d7a58;
-  font-size: 9px;
+  font-size: 12px;
 }
 
 :deep(.watch-zone-heading small) {
   color: #77837d;
-  font-size: 7px;
+  font-size: 10px;
 }
 
 :deep(.watch-zone-popup span b) {
@@ -697,7 +656,7 @@ onBeforeUnmount(() => {
 :deep(.watch-zone-actions button) {
   padding: 2px;
   color: #2d7a58;
-  font-size: 7px;
+  font-size: 10px;
   background: transparent;
   border: 0;
 }
@@ -742,5 +701,35 @@ onBeforeUnmount(() => {
     flex-direction: column;
     gap: 4px;
   }
+}
+</style>
+<style scoped>
+:deep(.habitat-tooltip) {
+  background: #ffffff;
+  border: 1px solid #d4ddd8;
+  border-radius: 6px;
+  color: #2b4137;
+  font-size: 14px;
+  box-shadow: 0 4px 12px rgba(17, 38, 28, 0.15);
+  padding: 6px 10px;
+}
+:deep(.habitat-tooltip strong) {
+  color: #2c7657;
+}
+</style>
+<style>
+.viewing-point-tooltip {
+  background: white;
+  border: 1px solid #d5e0da;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  padding: 8px 12px;
+  color: #173d2d;
+  font-family: inherit;
+}
+.viewing-point-tooltip strong {
+  display: block;
+  font-size: 17px;
+  margin-bottom: 2px;
 }
 </style>

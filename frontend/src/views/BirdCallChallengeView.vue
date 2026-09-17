@@ -1,51 +1,89 @@
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, ref, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
+import { gallerySpecies } from '../mocks/gallery'
+import { useAudio } from '../composables/useAudio'
+import { useExplorer } from '../composables/useExplorer'
 import nightParrotImage from '../assets/night-parrot.jpg'
+import princessParrotImage from '../assets/princess-parrot.jpg'
+import plainsWandererImage from '../assets/plains-wanderer.jpg'
+import rufousScrubBirdImage from '../assets/rufous-scrub-bird.jpg'
+import malleefowlImage from '../assets/malleefowl.jpg'
+import duskyGrasswrenImage from '../assets/dusky-grasswren.jpg'
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'
+
+const imageMap = {
+  'night-parrot.jpg': nightParrotImage,
+  'princess-parrot.jpg': princessParrotImage,
+  'plains-wanderer.jpg': plainsWandererImage,
+  'rufous-scrub-bird.jpg': rufousScrubBirdImage,
+  'malleefowl.jpg': malleefowlImage,
+  'dusky-grasswren.jpg': duskyGrasswrenImage
+}
 
 const router = useRouter()
+const { explorer } = useExplorer()
+const { currentlyPlayingId, currentTime, duration, playAudio, stopAudio } = useAudio()
 
-const answers = [
-  {
-    id: 'night-parrot',
-    name: 'Night Parrot',
-    scientificName: 'Pezoporus occidentalis'
-  },
-  {
-    id: 'princess-parrot',
-    name: 'Princess Parrot',
-    scientificName: 'Polytelis alexandrae'
-  },
-  {
-    id: 'plains-wanderer',
-    name: 'Plains-wanderer',
-    scientificName: 'Pedionomus torquatus'
-  },
-  {
-    id: 'rufous-scrub-bird',
-    name: 'Rufous Scrub-bird',
-    scientificName: 'Atrichornis rufescens'
-  }
-]
-
+const answers = ref([])
 const selectedAnswer = ref(null)
 const submitted = ref(false)
-
-const correctAnswer = 'night-parrot'
+const correctAnswerId = ref(null)
 
 const isCorrect = computed(
-  () => submitted.value && selectedAnswer.value === correctAnswer
+  () => submitted.value && selectedAnswer.value === correctAnswerId.value
 )
+
+const theCorrectBird = computed(() => gallerySpecies.find(b => b.id === correctAnswerId.value))
+
+function generateQuestion() {
+  stopAudio()
+  selectedAnswer.value = null
+  submitted.value = false
+
+  // Pick random correct
+  const shuffledSpecies = [...gallerySpecies].sort(() => Math.random() - 0.5)
+  const correct = shuffledSpecies[0]
+  correctAnswerId.value = correct.id
+  
+  // Use all 6 birds, just shuffle them
+  const options = [...gallerySpecies].sort(() => Math.random() - 0.5)
+  answers.value = options.map(b => ({
+    id: b.id,
+    name: b.name,
+    scientificName: b.scientificName
+  }))
+}
+
+onMounted(() => {
+  generateQuestion()
+})
+
+onBeforeUnmount(() => {
+  stopAudio()
+})
 
 function selectAnswer(id) {
   if (submitted.value) return
   selectedAnswer.value = id
 }
 
-function submitAnswer() {
+async function submitAnswer() {
   if (!selectedAnswer.value) return
-
   submitted.value = true
+  
+  if (isCorrect.value && explorer.value) {
+    try {
+      await fetch(`${API_BASE_URL}/api/v1/challenge/success`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: explorer.value.displayName })
+      })
+    } catch (e) {
+      console.error('Failed to save challenge points', e)
+    }
+  }
 }
 
 function tryAgain() {
@@ -54,22 +92,13 @@ function tryAgain() {
 }
 
 function playCall() {
-  // Mocking phase: backend/audio integration will be added later.
-  console.log('Playing mocked Night Parrot call')
+  if (correctAnswerId.value) {
+    playAudio(correctAnswerId.value)
+  }
 }
 
 function nextCall() {
-  selectedAnswer.value = null
-  submitted.value = false
-}
-
-function viewBird() {
-  router.push({
-    path: '/gallery',
-    query: {
-      species: 'night-parrot'
-    }
-  })
+  generateQuestion()
 }
 </script>
 
@@ -93,8 +122,7 @@ function viewBird() {
         <div class="challenge-column">
           <section class="audio-card">
             <div class="audio-meta">
-              <span>● Mystery Call #04 · Recorded at Fortescue Basin, Dusk</span>
-              <span class="quality">Audio Quality: Pristine</span>
+              <span>● Mystery Call</span>
             </div>
 
             <div class="waveform-box">
@@ -110,23 +138,20 @@ function viewBird() {
               </div>
 
               <div class="time-row">
-                <span>0:04</span>
+                <span>0:{{ Math.floor(currentTime).toString().padStart(2, '0') }}</span>
                 <div class="progress-track">
-                  <div class="progress-value"></div>
+                  <div class="progress-value" :style="{ width: (duration ? (currentTime / duration) * 100 : 0) + '%' }"></div>
                 </div>
-                <span>0:12</span>
+                <span>0:{{ Math.floor(duration || 0).toString().padStart(2, '0') }}</span>
               </div>
             </div>
 
             <div class="audio-actions">
               <button class="play-button" type="button" @click="playCall">
-                🔊 Play Bird Call
+                {{ currentlyPlayingId === correctAnswerId ? '■ Stop Audio' : '🔊 Play Bird Call' }}
               </button>
 
-              <div class="secondary-actions">
-                <button type="button" @click="playCall">↻ Listen Again</button>
-                <span class="speed">1×</span>
-              </div>
+
             </div>
           </section>
 
@@ -149,12 +174,12 @@ function viewBird() {
                   selected: selectedAnswer === answer.id,
                   correct:
                     submitted &&
-                    answer.id === correctAnswer &&
-                    selectedAnswer === correctAnswer,
+                    answer.id === correctAnswerId &&
+                    selectedAnswer === correctAnswerId,
                   incorrect:
                     submitted &&
                     answer.id === selectedAnswer &&
-                    selectedAnswer !== correctAnswer
+                    selectedAnswer !== correctAnswerId
                 }"
                 type="button"
                 @click="selectAnswer(answer.id)"
@@ -162,8 +187,8 @@ function viewBird() {
                 <span class="choice-indicator">
                   {{
                     submitted &&
-                    answer.id === correctAnswer &&
-                    selectedAnswer === correctAnswer
+                    answer.id === correctAnswerId &&
+                    selectedAnswer === correctAnswerId
                       ? '✓'
                       : ''
                   }}
@@ -183,13 +208,7 @@ function viewBird() {
               </button>
             </div>
 
-            <p
-              v-if="submitted && !isCorrect"
-              class="incorrect-message"
-              role="alert"
-            >
-              That is not the mystery bird. Listen again and try another answer.
-            </p>
+            
 
             <button
               v-if="!submitted"
@@ -201,52 +220,40 @@ function viewBird() {
               Submit Answer
             </button>
 
-            <button
-              v-else-if="!isCorrect"
-              class="submit-button"
-              type="button"
-              @click="tryAgain"
-            >
-              Try Again
-            </button>
+            
           </section>
         </div>
 
-        <aside v-if="isCorrect" class="result-card">
-          <div class="result-heading">🎉 Correct! 🎉</div>
+        <aside v-if="submitted" class="result-card">
+          <div class="result-heading" :style="{ color: isCorrect ? '#2b7a54' : '#e74c3c' }">
+            {{ isCorrect ? '🎉 Correct! 🎉' : '❌ Incorrect ❌' }}
+          </div>
 
           <img
-            :src="nightParrotImage"
-            alt="Night Parrot in its natural habitat"
+            v-if="isCorrect"
+            :src="theCorrectBird ? imageMap[theCorrectBird.image] : nightParrotImage"
+            :alt="theCorrectBird?.name"
           />
 
           <div class="result-content">
-            <div class="status-row">
-              <span class="status-badge">CRITICALLY ENDANGERED</span>
-              <span>Audio Matched</span>
-            </div>
+            <h3 v-if="isCorrect">{{ theCorrectBird?.name }}</h3>
+            <h3 v-else>That was not correct.</h3>
+            
+            <p v-if="isCorrect">
+              Great job! You successfully identified the call of the {{ theCorrectBird?.name }}.
+            </p>
+            <p v-else>
+              You selected the wrong bird. Listen carefully to the audio again.
+            </p>
 
-            <h2>Night Parrot</h2>
-            <p class="scientific-name">Pezoporus occidentalis</p>
-
-            <div class="fact-box">
-              <strong>💡 Did you know?</strong>
-              <p>
-                Night Parrots produce a distinct two-note whistle call
-                predominantly during dusk and within 45 minutes after sunset in
-                dense spinifex grassland.
-              </p>
-            </div>
-
-            <div class="result-actions">
-              <button type="button" class="next-button" @click="nextCall">
-                Next Call →
-              </button>
-
-              <button type="button" class="bird-button" @click="viewBird">
-                View this Bird ↗
-              </button>
-            </div>
+            <button
+              class="investigation-button"
+              type="button"
+              style="margin-top: 1rem; width: 100%"
+              @click="isCorrect ? nextCall() : tryAgain()"
+            >
+              {{ isCorrect ? 'Next Question →' : 'Try Again ↻' }}
+            </button>
           </div>
         </aside>
       </div>
@@ -285,7 +292,7 @@ function viewBird() {
 .eyebrow {
   margin: 0 0 7px;
   color: #2c835f;
-  font-size: 12px;
+  font-size: 15px;
   font-weight: 800;
   letter-spacing: 0.08em;
 }
@@ -340,7 +347,7 @@ function viewBird() {
   gap: 15px;
   margin-bottom: 17px;
   color: #385748;
-  font-size: 12px;
+  font-size: 15px;
   font-weight: 700;
 }
 
@@ -383,7 +390,7 @@ function viewBird() {
   align-items: center;
   gap: 10px;
   color: #557065;
-  font-size: 11px;
+  font-size: 14px;
 }
 
 .progress-track {
@@ -446,12 +453,12 @@ function viewBird() {
   gap: 9px;
   margin: 0;
   color: #243d32;
-  font-size: 22px;
+  font-size: 25px;
 }
 
 .answer-heading > span {
   color: #718078;
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 700;
 }
 
@@ -463,7 +470,7 @@ function viewBird() {
   border-radius: 50%;
   background: #e7f6ee;
   color: #28815c;
-  font-size: 13px;
+  font-size: 16px;
 }
 
 .answer-grid {
@@ -511,7 +518,7 @@ function viewBird() {
   border-radius: 50%;
   background: #dce3df;
   color: white;
-  font-size: 12px;
+  font-size: 15px;
   font-weight: 800;
 }
 
@@ -525,18 +532,18 @@ function viewBird() {
 }
 
 .answer-text strong {
-  font-size: 14px;
+  font-size: 17px;
 }
 
 .answer-text em {
   color: #7a8881;
   font-family: Georgia, serif;
-  font-size: 11px;
+  font-size: 14px;
 }
 
 .selected-mark {
   color: #1d704e;
-  font-size: 11px;
+  font-size: 14px;
 }
 
 .submit-button {
@@ -559,7 +566,7 @@ function viewBird() {
 .incorrect-message {
   margin: 16px 0 0;
   color: #b14444;
-  font-size: 13px;
+  font-size: 16px;
 }
 
 .result-card {
@@ -570,7 +577,7 @@ function viewBird() {
   padding: 14px 18px;
   background: #09633f;
   color: white;
-  font-size: 21px;
+  font-size: 24px;
   font-weight: 800;
 }
 
@@ -590,7 +597,7 @@ function viewBird() {
   justify-content: space-between;
   gap: 10px;
   color: #37805f;
-  font-size: 10px;
+  font-size: 13px;
   font-weight: 800;
 }
 
@@ -600,7 +607,7 @@ function viewBird() {
 
 .result-content h2 {
   margin: 14px 0 2px;
-  font-size: 24px;
+  font-size: 27px;
 }
 
 .scientific-name {
@@ -615,7 +622,7 @@ function viewBird() {
   border-radius: 9px;
   background: #f2f6f3;
   color: #496057;
-  font-size: 12px;
+  font-size: 15px;
   line-height: 1.5;
 }
 

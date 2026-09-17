@@ -373,7 +373,7 @@ function completeExploration() {
 .back-button {
   padding: 0;
   color: #496258;
-  font-size: 10px;
+  font-size: 13px;
   background: transparent;
   border: 0;
 }
@@ -389,20 +389,20 @@ function completeExploration() {
 .title-row p {
   margin: 0 0 4px;
   color: #718078;
-  font-size: 10px;
+  font-size: 13px;
 }
 
 .title-row h1 {
   margin: 0;
   color: #194b35;
-  font-size: 28px;
+  font-size: 31px;
   font-weight: 700;
 }
 
 .session-status {
   padding: 6px 10px;
   color: #9a6411;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 700;
   background: #ffedc8;
   border-radius: 13px;
@@ -445,19 +445,19 @@ function completeExploration() {
 
 .map-summary strong {
   color: #405249;
-  font-size: 10px;
+  font-size: 13px;
 }
 
 .map-summary small {
   margin-top: 3px;
   color: #7b8580;
-  font-size: 8px;
+  font-size: 11px;
 }
 
 .map-summary > span {
   padding: 5px 7px;
   color: #3265e8;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 700;
   white-space: nowrap;
   background: #e7edff;
@@ -469,7 +469,7 @@ function completeExploration() {
   right: 15px;
   padding: 8px 11px;
   color: #276e4d;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 700;
   border-radius: 14px;
 }
@@ -506,7 +506,7 @@ function completeExploration() {
 
 .species-summary span {
   color: #d45454;
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
 }
@@ -514,18 +514,18 @@ function completeExploration() {
 .species-summary h2 {
   margin: 3px 0 1px;
   color: #35483e;
-  font-size: 15px;
+  font-size: 18px;
 }
 
 .species-summary em {
   color: #758079;
   font-family: Georgia, serif;
-  font-size: 9px;
+  font-size: 12px;
 }
 
 .species-summary > strong {
   color: #3265e8;
-  font-size: 12px;
+  font-size: 15px;
 }
 
 .progress-card h2,
@@ -533,7 +533,7 @@ function completeExploration() {
 .finish-card h2 {
   margin: 0;
   color: #405148;
-  font-size: 12px;
+  font-size: 15px;
   font-weight: 700;
 }
 
@@ -541,7 +541,7 @@ function completeExploration() {
 .finish-card p {
   margin: 4px 0 13px;
   color: #7b8680;
-  font-size: 9px;
+  font-size: 12px;
   line-height: 1.5;
 }
 
@@ -569,18 +569,18 @@ function completeExploration() {
 }
 
 .observation-record strong {
-  font-size: 10px;
+  font-size: 13px;
 }
 
 .observation-record p {
   margin: 2px 0;
   color: #66736c;
-  font-size: 8px;
+  font-size: 11px;
 }
 
 .observation-record a,
 .observation-record time {
-  font-size: 8px;
+  font-size: 11px;
 }
 
 .card-heading {
@@ -591,7 +591,7 @@ function completeExploration() {
 
 .card-heading span {
   color: #718078;
-  font-size: 8px;
+  font-size: 11px;
 }
 
 .notice-grid {
@@ -619,27 +619,27 @@ function completeExploration() {
 .notice-option strong,
 .notice-option small {
   display: block;
-  font-size: 9px;
+  font-size: 12px;
 }
 
 .notice-option small {
   margin-top: 2px;
   color: #89918d;
-  font-size: 8px;
+  font-size: 11px;
 }
 
 .notice-card label {
   display: block;
   margin-bottom: 6px;
   color: #526159;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 700;
 }
 
 .notice-card textarea {
   width: 100%;
   padding: 9px;
-  font-size: 9px;
+  font-size: 12px;
   resize: vertical;
   border: 1px solid #dce3df;
   border-radius: 7px;
@@ -655,7 +655,7 @@ function completeExploration() {
 .attachment-actions button {
   padding: 8px;
   color: #66736c;
-  font-size: 9px;
+  font-size: 12px;
   background: #ffffff;
   border: 1px dashed #cfd8d2;
   border-radius: 7px;
@@ -665,7 +665,7 @@ function completeExploration() {
   width: 100%;
   padding: 11px;
   color: #ffffff;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 700;
   background: #121c2e;
   border: 0;
@@ -681,7 +681,7 @@ function completeExploration() {
   width: 100%;
   padding: 11px;
   color: #ffffff;
-  font-size: 10px;
+  font-size: 13px;
   font-weight: 700;
   background: #2d7a58;
   border: 0;
@@ -716,7 +716,7 @@ function completeExploration() {
   top: 14px;
   right: 16px;
   color: #8a948f;
-  font-size: 22px;
+  font-size: 25px;
   background: transparent;
   border: 0;
 }
@@ -727,7 +727,7 @@ function completeExploration() {
   height: 38px;
   margin-bottom: 14px;
   color: #277653;
-  font-size: 18px;
+  font-size: 21px;
   font-weight: 700;
   place-items: center;
   background: #dff4e8;
@@ -737,14 +737,14 @@ function completeExploration() {
 .finish-modal h2 {
   margin: 0 0 5px;
   color: #273a31;
-  font-size: 20px;
+  font-size: 23px;
   font-weight: 700;
 }
 
 .modal-location {
   margin: 0 0 18px;
   color: #748078;
-  font-size: 10px;
+  font-size: 13px;
 }
 
 .modal-summary {
@@ -769,19 +769,19 @@ function completeExploration() {
 
 .modal-summary strong {
   color: #273d32;
-  font-size: 18px;
+  font-size: 21px;
 }
 
 .modal-summary span {
   margin-top: 3px;
   color: #7b8580;
-  font-size: 9px;
+  font-size: 12px;
 }
 
 .recorded-section h3 {
   margin-bottom: 9px;
   color: #68736d;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 700;
   text-transform: uppercase;
 }
@@ -803,13 +803,13 @@ function completeExploration() {
 }
 
 .modal-observation strong {
-  font-size: 9px;
+  font-size: 12px;
 }
 
 .modal-observation span,
 .modal-observation time {
   color: #6d7872;
-  font-size: 8px;
+  font-size: 11px;
 }
 
 .after-finish {
@@ -822,26 +822,26 @@ function completeExploration() {
 }
 
 .after-finish strong {
-  font-size: 9px;
+  font-size: 12px;
 }
 
 .after-finish p {
   margin: 5px 0;
   color: #54685e;
-  font-size: 9px;
+  font-size: 12px;
   line-height: 1.45;
 }
 
 .after-finish small {
   color: #809087;
-  font-size: 8px;
+  font-size: 11px;
 }
 
 .complete-button,
 .continue-button {
   width: 100%;
   padding: 11px;
-  font-size: 10px;
+  font-size: 13px;
   font-weight: 700;
   border-radius: 7px;
 }

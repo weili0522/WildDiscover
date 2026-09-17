@@ -142,7 +142,7 @@ const emit = defineEmits([
   position: absolute;
   top: 13px;
   padding: 5px 8px;
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 700;
   border-radius: 11px;
 }
@@ -192,21 +192,21 @@ const emit = defineEmits([
 .species-heading h2 {
   margin: 0;
   color: #23533e;
-  font-size: 17px;
+  font-size: 20px;
   font-weight: 700;
 }
 
 .species-heading em {
   color: #79837e;
   font-family: Georgia, serif;
-  font-size: 9px;
+  font-size: 12px;
 }
 
 .description {
   min-height: 44px;
   margin: 0 0 12px;
   color: #66736c;
-  font-size: 10px;
+  font-size: 13px;
   line-height: 1.5;
 }
 
@@ -221,7 +221,7 @@ const emit = defineEmits([
 .listen-button {
   padding: 6px 9px;
   color: #267653;
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 700;
   background: #e0f4e9;
   border: 0;
@@ -245,7 +245,7 @@ const emit = defineEmits([
 
 .audio-row small {
   color: #7a857f;
-  font-size: 8px;
+  font-size: 11px;
 }
 
 .card-actions {
@@ -259,7 +259,7 @@ const emit = defineEmits([
 .map-link,
 .details-button {
   padding: 7px 10px;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 700;
   border-radius: 6px;
 }
