@@ -78,8 +78,3 @@ The application is automatically built and distributed via a GitHub-connected Co
   
 * **Iteration Archiving**: The exact codebase delivered at the end of each academic sprint is locked using a Git tag (e.g., `tag: iteration-2`). This specific branch is mapped to a preserved, iteration-specific URL, while the `main` branch continues to deploy to the live production URL.
 
-
-* **Backend Hosting (Render)**: The platform detects webhook pings from GitHub, natively reads the Dockerfile in the repository, and containerizes the updated FastAPI server automatically with zero downtime.
-
-
-* **Iteration Archiving**: The exact codebase delivered at the end of each academic sprint is locked using a Git tag (e.g., `tag: iteration-1`). This specific commit is mapped to a preserved, iteration-specific subdomain, while the root URL continues to receive live development updates.
