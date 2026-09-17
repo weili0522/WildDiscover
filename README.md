@@ -12,6 +12,11 @@ Climate change is shifting bird populations beyond their historically recorded r
 - Supports birdwatchers with location-aware search guidance.
 - Encourages citizen-science contributions through sighting reports.
 - Protects vulnerable species by keeping precise sighting locations private.
+- Supports birdwatchers with location-aware search guidance and overlays of popular viewing points.
+- Encourages citizen-science contributions through sighting reports and an Investigation Journal.
+- Gamifies conservation education with an interactive Bird Call Challenge and Global Leaderboard.
+- Protects vulnerable species by algorithmically blurring precise sighting locations to keep them private.
+- Maintains strict academic credibility by sourcing data from CSIRO, the Atlas of Living Australia (ALA), and the EPBC Act Database.
 
 ## Target users
 
@@ -32,9 +37,13 @@ The platform explores how species such as Australia’s Night Parrot—once beli
 
 * **`Models/`**: Contains exploratory Jupyter notebooks documenting feature engineering, cross-validation runs, and the comparative model selection process across candidate algorithms.
 
+* **`Maxent-model/`**: Stores the finalized MaxEnt model selected for deployment.
 
 * **`Maxent-model/`**: Stores the finalized MaxEnt model selected for Iteration 1 deployment.
+* **`backend/`**: Contains the stateless FastAPI web service, SQLite/SQLAlchemy database management (for user profiles, journals, and leaderboards), and the prediction engine that serves on-the-fly GeoJSON suitability polygons.
+  * **`backend/data/`**: Houses the 18+ GB of raw CSIRO `.tif` raster data and OpenStreetMap POIs, alongside the optimized `.geojson` vector maps processed for the frontend.
 
+* **`frontend/`**: Houses the Vue.js/Vite client application, Leaflet map interface components, and educational species assets (including CC-licensed bioacoustic `.mp3` files from Xeno-canto).
 
 * **`backend/`**: Contains the stateless FastAPI web service, the production Docker configuration, and the prediction engine that loads the serialized model to serve on-the-fly GeoJSON suitability polygons.
 
@@ -49,10 +58,12 @@ The platform explores how species such as Australia’s Night Parrot—once beli
 ## Branching & Lifecycle Navigation
 
 * **Feature Branches**: Feature development tracks sequentially across specialized working branches (`ALA-Data-Cleaning`, `CSIRO-Data-Cleaning-&-Wrangling`, `Data-Integration`, `Modeling-part`, and `backend-api`) before merging into `main`.
+* **Feature Branches**: Feature development tracks sequentially across specialized working branches (e.g., `ALA-Data-Cleaning`, `backend-api`, `deployment-test`) before merging into `main`.
 
 
 * **Integration Trunk**: The `main` branch serves as the integration trunk for continuous delivery.
 
+* **Stable Snapshots**: The `iteration-1` and `iteration-2` branches (and their associated Git tags) preserve stable code snapshots. These branches are locked specifically for end-of-sprint deployments and grading.
 
 * **Stable Snapshots**: The `iteration1` branch and its associated Git tag preserve the stable code snapshot locked for the Iteration 1 deployment.
 
@@ -63,6 +74,9 @@ The platform explores how species such as Australia’s Night Parrot—once beli
 The application is automatically built and distributed via a GitHub-connected Continuous Deployment (CI/CD) pipeline, completely eliminating manual server uploads.
 
 * **Frontend Hosting (Vercel)**: The Vue.js interface automatically builds upon pushes to `main`.
+* **Unified Hosting (Render)**: Both the backend (FastAPI Web Service) and frontend (Vue.js Static Site) are unified under the Render platform. The platform detects webhook pings from GitHub and redeploys the services automatically with zero downtime.
+  
+* **Iteration Archiving**: The exact codebase delivered at the end of each academic sprint is locked using a Git tag (e.g., `tag: iteration-2`). This specific branch is mapped to a preserved, iteration-specific URL, while the `main` branch continues to deploy to the live production URL.
 
 
 * **Backend Hosting (Render)**: The platform detects webhook pings from GitHub, natively reads the Dockerfile in the repository, and containerizes the updated FastAPI server automatically with zero downtime.
