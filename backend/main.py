@@ -10,7 +10,7 @@ from fastapi.middleware.gzip import GZipMiddleware
 allowed_origins = [
     "http://localhost:5173",
     "https://wild-discover.vercel.app",
-    "https://wild-discover-46mf.vercel.app"
+    "https://wild-discover-46mf.vercel.app",
     "https://iteration1-wild-discover-46mf.vercel.app"
 ]
 
